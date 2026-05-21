@@ -651,18 +651,6 @@ if exist "!mountdir!\Windows\WinSxS\*microsoft-edge-webview*" (
     echo ============================================================
     %_dism2%:"!_cabdir!" %dismtarget% /Remove-Capability /CapabilityName:"Edge.WebView2.Platform~~~~"   
 )
-
-set _target_arch=%arch%
-if "%arch%"=="x64" (
-    set _target_arch=amd64
-)
-if "$($os_build -eq "26200")"=="True" if exist "!mountdir!\Windows\servicing\Packages\Package_for_RollupFix~31bf3856ad364e35~%_target_arch%~~26100.1742.1.10.cat" (
-    echo.
-    echo ============================================================
-    echo Removing 26100.1742...
-    echo ============================================================
-    %_dism2%:"!_cabdir!" %dismtarget% /Remove-Package /PackageName:"Package_for_RollupFix~31bf3856ad364e35~%_target_arch%~~26100.1742.1.10"   
-)
 "@ | Out-File -FilePath ".\hook_beforenet35.cmd"
 
 # write beforewim hook script
