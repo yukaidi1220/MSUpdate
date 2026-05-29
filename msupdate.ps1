@@ -87,6 +87,7 @@ switch ($MakeVersion) {
         $entgpack = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-EditionSpecific-EnterpriseG-Package.ESD"
         $entgLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-Client-LanguagePack-Package-arm64-zh-CN.esd"
         $msstore = $true
+        $Cleanup = $false
     }
     "w1125h264" {
         # make 11 25h2 x64
@@ -114,6 +115,7 @@ switch ($MakeVersion) {
         $entgpack = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-EditionSpecific-EnterpriseG-Package.ESD"
         $entgLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-Client-LanguagePack-Package-amd64-zh-CN.esd"
         $msstore = $true
+        $Cleanup = $false
     }
     "w11lt24a64" {
         # make 11 ltsc2024 arm64
@@ -136,6 +138,7 @@ switch ($MakeVersion) {
         $iexplorer = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-InternetExplorer-Optional-Package-arm64.cab"
         $iexplorerLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-InternetExplorer-Optional-Package-arm64-zh-CN.cab"
         $MultiEdition = $false
+        $Cleanup = $false
     }
     "w11lt2464" {
         # make 11 ltsc2024 x64
@@ -157,6 +160,7 @@ switch ($MakeVersion) {
         ).Replace("selectlang.php?id=", "")
         $iexplorer = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-InternetExplorer-Optional-Package-amd64.cab"
         $iexplorerLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-InternetExplorer-Optional-Package-amd64-zh-CN.cab"
+        $Cleanup = $false
     }
     "w1123h2a64" {
         # make 11 23h2 arm64
@@ -619,9 +623,6 @@ $W10UI = "@chcp 65001`n"
 $W10UI += (Invoke-WebRequest -Uri "https://github.com/abbodi1406/BatUtil/raw/refs/heads/master/W10UI/W10UI.cmd").Content
 $W10UI = $W10UI.Replace("if %AddDrivers%==1 call :doDrv", "call %~dp0hook_beforewim.cmd`nif %AddDrivers%==1 call :doDrv")
 $W10UI = $W10UI.Replace("if %net35%==1 call :enablenet35", "call %~dp0hook_beforenet35.cmd`nif %net35%==1 call :enablenet35")
-if ($Cleanup) {
-    $W10UI = $W10UI.Replace("set Cleanup=0", "set Cleanup=1")
-}
 
 # write beforenet35 hook script
 @"
