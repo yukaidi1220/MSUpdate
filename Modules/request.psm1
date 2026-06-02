@@ -9,20 +9,20 @@ function Invoke-UUPApiRequest {
             1 { $Entrypoint = "https://uup.xrgzs.top/json-api" }
         }
         $RequestUri = "$Entrypoint/$Url"
-        Write-Host -ForegroundColor Yellow "Attempting request to $RequestUri (Attempt $($RetryCount + 1))..."
+        Write-Host -ForegroundColor Yellow "正在尝试请求 $RequestUri (第 $($RetryCount + 1) 次)..."
         $Response = Invoke-WebRequest -Uri $RequestUri `
             -SkipHttpErrorCheck `
             -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0" `
             -Headers @{ "accept-language" = "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6" }
         if ($Response.Content -notmatch 'Just a moment' -and $Response.StatusCode -eq 200 -and $Response.Content -ne "") {
-            Write-Host -ForegroundColor Green "Request successful!"
+            Write-Host -ForegroundColor Green "请求成功！"
             return $Response
         }
-        Write-Host -ForegroundColor Red "Request failed. Retrying in 1 seconds..."
+        Write-Host -ForegroundColor Red "请求失败，1秒后重试..."
         Start-Sleep -Seconds 1
         $RetryCount++
     }
-    throw "Failed to retrieve content from $Url after 10 attempts."
+    throw "经过10次尝试后仍无法从 $Url 获取内容。"
 }
 
 function Invoke-UUPWebRequest {
@@ -37,20 +37,20 @@ function Invoke-UUPWebRequest {
             2 { $Entrypoint = "https://uup.671001.xyz" }
         }
         $RequestUri = "$Entrypoint/$Url"
-        Write-Host -ForegroundColor Yellow "Attempting request to $RequestUri (Attempt $($RetryCount + 1))..."
+        Write-Host -ForegroundColor Yellow "正在尝试请求 $RequestUri (第 $($RetryCount + 1) 次)..."
         $Response = Invoke-WebRequest -Uri $RequestUri `
             -SkipHttpErrorCheck `
             -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0" `
             -Headers @{ "accept-language" = "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6" }
         if ($Response.Content -notmatch 'Just a moment' -and $Response.StatusCode -eq 200) {
-            Write-Host -ForegroundColor Green "Request successful!"
+            Write-Host -ForegroundColor Green "请求成功！"
             return $Response
         }
-        Write-Host -ForegroundColor Red "Request failed. Retrying in 1 seconds..."
+        Write-Host -ForegroundColor Red "请求失败，1秒后重试..."
         Start-Sleep -Seconds 1
         $RetryCount++
     }
-    throw "Failed to retrieve content from $Url after 10 attempts."
+    throw "经过10次尝试后仍无法从 $Url 获取内容。"
 }
 
 function Invoke-UUPWebRequestLink {
@@ -105,18 +105,18 @@ function Request-Update {
         $Name = $QueryString
         $AllLinks = Invoke-UUPWebRequestLink -Url "known.php?q=$QueryString" -LinkFilter @("*selectlang.php?id=*") -ContentFilter @("*amd64*")
     } else {
-        Write-Host -ForegroundColor Red "Please specify the correct parameter."
+        Write-Host -ForegroundColor Red "请指定正确的参数。"
         return $null
     }
-    Write-Host "Retrieved all known links of $Name : $($AllLinks | ConvertTo-Json)"
+    Write-Host "已获取 $Name 的所有已知链接: $($AllLinks | ConvertTo-Json)"
 
     $Link = $AllLinks | Where-Object { $_.outerHTML -notmatch '\.NET' -and $_.outerHTML -match 'Windows.*\((\d{5}\.\d{4})\)' } | Select-Object -First 1
     if ($Link -and $Link.outerHTML -match 'Windows.*\((\d{5}\.\d{4})\)') {
         $LatestVersion = $Matches[1]
-        Write-Host -ForegroundColor Green "The latest version of $Name is $LatestVersion"
+        Write-Host -ForegroundColor Green "$Name 的最新版本为 $LatestVersion"
         return $LatestVersion
     }
-    Write-Host -ForegroundColor Red "Failed to get the latest version of $Name"
+    Write-Host -ForegroundColor Red "获取 $Name 最新版本失败"
     return $null
 }
 
@@ -138,7 +138,7 @@ function Get-UUPFiles {
     $response = Invoke-UUPApiRequest -Url "get.php?$($query.ToString())" | ConvertFrom-Json -AsHashtable
 
     if ($null -eq $response) {
-        throw "Null response received from UUP API."
+        throw "从 UUP API 收到空响应。"
     }
 
 
@@ -163,12 +163,12 @@ function Get-UUPFiles {
     #   "jsonApiVersion": "string" // Current JSON API version
     # }
 
-    Write-Host -ForegroundColor Green "Remote UUP JSON Api version: $($response.jsonApiVersion)"
-    Write-Host -ForegroundColor Green "Update Name: $($response.response.updateName)"
-    Write-Host -ForegroundColor Green "Architecture: $($response.response.arch)"
-    Write-Host -ForegroundColor Green "Build Number: $($response.response.build)"
+    Write-Host -ForegroundColor Green "远程 UUP JSON API 版本: $($response.jsonApiVersion)"
+    Write-Host -ForegroundColor Green "更新名称: $($response.response.updateName)"
+    Write-Host -ForegroundColor Green "架构: $($response.response.arch)"
+    Write-Host -ForegroundColor Green "构建版本号: $($response.response.build)"
 
-    # convert to hashtable for easier access
+    # 转换为哈希表以便于访问
     $filesHashtable = @{}
     foreach ($fileName in $response.response.files.Keys) {
         $filesHashtable[$fileName] = $response.response.files.$fileName
@@ -191,11 +191,11 @@ function Get-UUPFile {
     )
 
     if (-not $UUPFilesCacheById.ContainsKey($Id)) {
-        Write-Host -ForegroundColor Yellow "Cache miss for Id $Id. Fetching UUP files..."
+        Write-Host -ForegroundColor Yellow "Id $Id 缓存未命中，正在获取 UUP 文件..."
         $files = Get-UUPFiles -Id $Id
         $UUPFilesCacheById[$Id] = $files
     } else {
-        Write-Host -ForegroundColor Green "Cache hit for Id $Id."
+        Write-Host -ForegroundColor Green "Id $Id 缓存命中。"
         $files = $UUPFilesCacheById[$Id]
     }
 
@@ -213,7 +213,7 @@ function Get-UUPFileLink {
 
     $file = Get-UUPFile -Id $Id -FileName $FileName
     if ($null -eq $file.url) {
-        throw "File URL is null for Id $Id and FileName $FileName."
+        throw "Id $Id 和文件名 $FileName 的文件 URL 为空。"
     }
     return $file.url
 }

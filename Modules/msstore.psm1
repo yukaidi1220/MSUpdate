@@ -1,4 +1,4 @@
-# Modified from https://github.com/MattiasC85/Scripts
+# 修改自 https://github.com/MattiasC85/Scripts
 
 function Get-CookieXML {
   $CookieXML = @'
@@ -224,7 +224,7 @@ function Get-StoreURLS {
   }
 
   if ($null -eq $objs) {
-    Write-Error "No URLs found for store app!"
+    Write-Error "未找到商店应用的下载链接！"
     return
   }
 
@@ -245,7 +245,7 @@ function Get-Appx {
   )
     
   try {
-    Write-Host "Getting download URLs for product: $ProductNumber" -ForegroundColor Cyan
+    Write-Host "正在获取产品 $ProductNumber 的下载链接..." -ForegroundColor Cyan
         
     # Use the Get-StoreURLS function from the module
     $StoreData = Get-StoreURLS -ProductNumber $ProductNumber
@@ -258,7 +258,7 @@ function Get-Appx {
     }
         
     if ($null -eq $StoreData -or $StoreData.Count -eq 0) {
-      Write-Error "No download URLs found for product: $ProductNumber"
+      Write-Error "未找到产品 $ProductNumber 的下载链接"
       return
     }
         
@@ -268,7 +268,7 @@ function Get-Appx {
     }
         
     foreach ($item in $StoreData) {
-      Write-Host "Processing: $($item.ID)" -ForegroundColor Yellow
+      Write-Host "正在处理: $($item.ID)" -ForegroundColor Yellow
             
       $url = $item.URLS[-1]
            
@@ -276,30 +276,30 @@ function Get-Appx {
       $fileName = $item.FileName 
 
       if ($fileName -notmatch '(arm64|x64|x86|neutral).*\.(appx|appxbundle|msix|msixbundle)\b') {
-        Write-Host "Invalid filename: $fileName" -ForegroundColor Red
+        Write-Host "无效文件名: $fileName" -ForegroundColor Red
         continue
       }
                 
       $filePath = Join-Path -Path $OutputPath -ChildPath $fileName
                 
       if (Test-Path -Path $filePath) {
-        Write-Warning "Already exists, skipping $fileName"
+        Write-Warning "已存在，跳过 $fileName"
         continue
       }
                 
       try {
-        Write-Host "== Downloading $fileName" -ForegroundColor Green
+        Write-Host "== 正在下载 $fileName" -ForegroundColor Green
         Write-Debug "URL: $url"
                     
         Invoke-WebRequest -Uri $url -OutFile $filePath -UseBasicParsing
-        Write-Host "Downloaded: $fileName" -ForegroundColor Green
+        Write-Host "已下载: $fileName" -ForegroundColor Green
       } catch {
-        Write-Error "Failed to download $fileName`: $($_.Exception.Message)"
+        Write-Error "下载 $fileName 失败: $($_.Exception.Message)"
       }
     }
         
   } catch {
-    Write-Error "Failed to get store URLs: $($_.Exception.Message)"
+    Write-Error "获取商店 URL 失败: $($_.Exception.Message)"
   }
 }
 

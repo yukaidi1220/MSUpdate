@@ -5,12 +5,12 @@ Import-Module "$PSScriptRoot\Modules\request.psm1"
 Import-Module "$PSScriptRoot\Modules\aria2.psm1"
 Import-Module "$PSScriptRoot\Modules\msstore.psm1"
 
-# Define Helper Functions
+# 定义辅助函数
 
-# set system info
+# 设置系统信息
 switch ($MakeVersion) {
     "w1126h1a64" {
-        # make 11 26h1 arm64
+        # 制作 Win11 26H1 ARM64
         $os_ver = "11"
         $os_rsversion = "26H1"
         $os_build = "28000"
@@ -36,7 +36,7 @@ switch ($MakeVersion) {
         $msstore = $true
     }
     "w1126h164" {
-        # make 11 26h1 x64
+        # 制作 Win11 26H1 X64
         $os_ver = "11"
         $os_rsversion = "26H1"
         $os_build = "28000"
@@ -62,7 +62,7 @@ switch ($MakeVersion) {
         $msstore = $true
     }
     "w1125h2a64" {
-        # make 11 25h2 arm64
+        # 制作 Win11 25H2 ARM64
         $os_ver = "11"
         $os_rsversion = "25H2"
         $os_build = "26200"
@@ -90,7 +90,7 @@ switch ($MakeVersion) {
         $Cleanup = $false
     }
     "w1125h264" {
-        # make 11 25h2 x64
+        # 制作 Win11 25H2 X64
         $os_ver = "11"
         $os_rsversion = "25H2"
         $os_build = "26200"
@@ -118,7 +118,7 @@ switch ($MakeVersion) {
         $Cleanup = $false
     }
     "w11lt24a64" {
-        # make 11 ltsc2024 arm64
+        # 制作 Win11 LTSC2024 ARM64
         $os_ver = "11"
         $os_rsversion = "24H2"
         $os_build = "26100"
@@ -141,7 +141,7 @@ switch ($MakeVersion) {
         $Cleanup = $false
     }
     "w11lt2464" {
-        # make 11 ltsc2024 x64
+        # 制作 Win11 LTSC2024 X64
         $os_ver = "11"
         $os_rsversion = "24H2"
         $os_build = "26100"
@@ -163,7 +163,7 @@ switch ($MakeVersion) {
         $Cleanup = $false
     }
     "w1123h2a64" {
-        # make 11 23h2 arm64
+        # 制作 Win11 23H2 ARM64
         $os_ver = "11"
         $os_rsversion = "23H2"
         $os_build = "22631"
@@ -188,7 +188,7 @@ switch ($MakeVersion) {
         $msstore = $true
     }
     "w1123h264" {
-        # make 11 23h2 x64
+        # 制作 Win11 23H2 X64
         $os_ver = "11"
         $os_rsversion = "23H2"
         $os_build = "22631"
@@ -223,7 +223,7 @@ switch ($MakeVersion) {
         $msstore = $true
     }
     "w1022h2a64" {
-        # make 10 22h2 arm64
+        # 制作 Win10 22H2 ARM64
         $os_ver = "10"
         $os_rsversion = "22H2"
         $os_build = "19045"
@@ -248,7 +248,7 @@ switch ($MakeVersion) {
         $msstore = $true
     }
     "w1022h264" {
-        # make 10 22h2 x64
+        # 制作 Win10 22H2 X64
         $os_ver = "10"
         $os_rsversion = "22H2"
         $os_build = "19045"
@@ -280,7 +280,7 @@ switch ($MakeVersion) {
         $msstore = $true
     }
     "w1022h232" {
-        # make 10 22h2 x86
+        # 制作 Win10 22H2 X86
         $os_ver = "10"
         $os_rsversion = "22H2"
         $os_build = "19045"
@@ -312,7 +312,7 @@ switch ($MakeVersion) {
         $msstore = $true
     }
     "w10lt2164" {
-        # make 10 ltsc2021 x64
+        # 制作 Win10 LTSC2021 X64
         $os_ver = "10"
         $os_rsversion = "21H2"
         $os_build = "19044"
@@ -335,7 +335,7 @@ switch ($MakeVersion) {
         $NETScript = "https://raw.githubusercontent.com/adavak/Win_ISO_Patching_Scripts/master/Scripts/netfx4.8.1/script_netfx4.8.1_19041_x64.meta4"
     }
     "w10lt2132" {
-        # make 10 ltsc2021 x86
+        # 制作 Win10 LTSC2021 X86
         $os_ver = "10"
         $os_rsversion = "21H2"
         $os_build = "19044"
@@ -358,7 +358,7 @@ switch ($MakeVersion) {
         $NETScript = "https://raw.githubusercontent.com/adavak/Win_ISO_Patching_Scripts/master/Scripts/netfx4.8.1/script_netfx4.8.1_19041_x86.meta4"
     }
     "w10lt1964" {
-        # make 10 ltsc2019 x64
+        # 制作 Win10 LTSC2019 X64
         $os_ver = "10"
         $os_rsversion = "1809"
         $os_build = "17763"
@@ -381,7 +381,7 @@ switch ($MakeVersion) {
         $NETScript = "https://raw.githubusercontent.com/adavak/Win_ISO_Patching_Scripts/master/Scripts/netfx4.8/script_netfx4.8_17763_x64.meta4"
     }
     "w10lt1932" {
-        # make 10 ltsc2019 x32
+        # 制作 Win10 LTSC2019 X86
         $os_ver = "10"
         $os_rsversion = "1809"
         $os_build = "17763"
@@ -404,7 +404,7 @@ switch ($MakeVersion) {
         $NETScript = "https://raw.githubusercontent.com/adavak/Win_ISO_Patching_Scripts/master/Scripts/netfx4.8/script_netfx4.8_17763_x86.meta4"
     }
     "w10lt1664" {
-        # make 10 ltsb2016 x64 (unsupport uup)
+        # 制作 Win10 LTSB2016 X64 (不支持 UUP)
         $os_ver = "10"
         $os_rsversion = "1607"
         $os_build = "14393"
@@ -419,7 +419,7 @@ switch ($MakeVersion) {
         $MultiEdition = $false
     }
     "w10lt1632" {
-        # make 10 ltsb2016 x86 (unsupport uup)
+        # 制作 Win10 LTSB2016 X86 (不支持 UUP)
         $os_ver = "10"
         $os_rsversion = "1607"
         $os_build = "14393"
@@ -436,8 +436,8 @@ switch ($MakeVersion) {
         $MultiEdition = $false
     }
     default {
-        Write-Error "Not defined or Unsupported OS version!
-        Example:
+        Write-Error "未定义或不支持的操作系统版本！
+        示例:
             `$MakeVersion   = [string] `"w1064`"
             `$UpdateFromUUP = [bool]   `$False
             `$MultiEdition  = [bool]   `$True
@@ -446,19 +446,19 @@ switch ($MakeVersion) {
     }
 }
 
-# ltsxfix
+# LTS 版本修正
 if ($os_edition -like "*LTS*") {
     $msstore = $true
     $os_release = $os_edition
 } else {
     $os_release = $os_rsversion
-    # os_edition fix
+    # os_edition 修正
     if ($MultiEdition -eq $true) {
         $os_edition = "Multi"
     }
 }
 
-# remove temporaty files
+# 清理临时文件
 Remove-Item -Path ".\temp\" -Recurse -ErrorAction Ignore
 Remove-Item -Path ".\entg\" -Recurse -ErrorAction Ignore
 Remove-Item -Path ".\patch\" -Recurse -ErrorAction Ignore
@@ -467,7 +467,7 @@ Remove-Item -Path ".\W10UI.cmd" -Recurse -ErrorAction Ignore
 New-Item -Path ".\temp\" -ItemType "directory" -ErrorAction Ignore
 New-Item -Path ".\bin\" -ItemType "directory" -ErrorAction Ignore
 
-# Installing dependencies
+# 安装依赖
 function Test-Hashes {
     param (
         [hashtable]$Hashes,
@@ -476,15 +476,15 @@ function Test-Hashes {
     return $Hashes.GetEnumerator() | ForEach-Object {
         $file = $_.Key
         $expectedHash = $_.Value
-        Write-Host -ForegroundColor Blue "Verifying $file $Algorithm hash ..."
-        Write-Host -ForegroundColor Gray "Expected: $expectedHash"
+        Write-Host -ForegroundColor Blue "正在校验 $file 的 $Algorithm 哈希..."
+        Write-Host -ForegroundColor Gray "期望值: $expectedHash"
         $actualHash = (Get-FileHash -Path $file -Algorithm $Algorithm).Hash
-        Write-Host -ForegroundColor Gray "Actual  : $actualHash"
+        Write-Host -ForegroundColor Gray "实际值: $actualHash"
         if ($actualHash -ne $expectedHash) {
             # return $false
-            Write-Error "$file hash not match."
+            Write-Error "$file 哈希不匹配。"
         } else {
-            Write-Host -ForegroundColor Green "$file hash match."
+            Write-Host -ForegroundColor Green "$file 哈希校验通过。"
         }
     }
 }
@@ -492,10 +492,10 @@ function Test-SHA256 ([hashtable]$Hashes) { return Test-Hashes -Hashes $Hashes -
 function Test-MD5 ([hashtable]$Hashes) { return Test-Hashes -Hashes $Hashes -Algorithm "MD5" }
 
 if (-not (Test-Path -Path "C:\Program Files\7-Zip\7z.exe")) {
-    Write-Error "7-zip not found, please install it manually!"
+    Write-Error "未找到 7-Zip，请手动安装！"
 }
 if (-not (Test-Path -Path ".\bin\aria2c.exe")) {
-    Write-Host "aria2c not found, downloading..."
+    Write-Host "未找到 aria2c，正在下载..."
     Invoke-WebRequest -Uri 'https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0-win-64bit-build1.zip' -OutFile ".\temp\aria2.zip"
     Expand-Archive -Path ".\temp\aria2.zip" -DestinationPath ".\temp" -Force
     Move-Item -Path ".\temp\aria2-1.37.0-win-64bit-build1\aria2c.exe" -Destination ".\bin\aria2c.exe" -Force
@@ -504,7 +504,7 @@ Test-SHA256 @{
     ".\bin\aria2c.exe" = "BE2099C214F63A3CB4954B09A0BECD6E2E34660B886D4C898D260FEBFE9D70C2" 
 }
 if (-not (Test-Path -Path ".\bin\wimlib-imagex.exe")) {
-    Write-Host "wimlib-imagex not found, downloading..."
+    Write-Host "未找到 wimlib-imagex，正在下载..."
     Invoke-WebRequest -Uri 'https://github.com/user-attachments/files/25449494/wimlib-1.14.5-windows-x86_64-bin.zip' -OutFile ".\temp\wimlib.zip"
     Expand-Archive -Path ".\temp\wimlib.zip" -DestinationPath ".\temp\wimlib" -Force
     Copy-Item -Path ".\temp\wimlib\wimlib-imagex.exe" -Destination ".\bin\wimlib-imagex.exe"
@@ -515,7 +515,7 @@ Test-SHA256 @{
     ".\bin\libwim-15.dll"     = "BA853EE1E3FC5F5798581F02E8E066BA07A0A2375F0BF444FE981431FD508495"
 }
 if (-not (Test-Path -Path ".\bin\PSFExtractor.exe")) {
-    Write-Host "PSFExtractor not found, downloading..."
+    Write-Host "未找到 PSFExtractor，正在下载..."
     Invoke-WebRequest -Uri 'https://github.com/Secant1006/PSFExtractor/releases/download/v3.07/PSFExtractor-v3.07-x64.zip' -OutFile ".\temp\PSFExtractor.zip"
     Expand-Archive -Path ".\temp\PSFExtractor.zip" -DestinationPath ".\bin" -Force
 }
@@ -523,38 +523,38 @@ Test-SHA256 @{
     ".\bin\PSFExtractor.exe" = "B8A08DD9592E64843056CF5FE518E782FD7ED517D1EE32B70A99B7D7E5767F6C"
 }
 
-# get wupatch
+# 获取 Windows 更新补丁
 if ($UpdateFromUUP) {
     $UUPScript = "https://uupdump.net/get.php?id=$uupid&pack=0&edition=updateOnly&aria2=2"
     .\bin\aria2c.exe -c -R --retry-wait=5 --check-certificate=false -d ".\temp" -o "UUPScript.txt" "$UUPScript"
-    if (!$?) { Write-Error "UUPScript File Download Failed!" }
+    if (!$?) { Write-Error "UUPScript 文件下载失败！" }
     .\bin\aria2c.exe -c -R --retry-wait=5 --check-certificate=false -x16 -s16 -j5 -d ".\patch" -i ".\temp\UUPScript.txt"
-    if (!$?) { Write-Error "UUPScript Download Failed!" }
+    if (!$?) { Write-Error "UUPScript 下载失败！" }
 } elseif ($null -ne $WUScript) {
     Invoke-WebRequest -Uri $WUScript -OutFile ".\temp\WUScript.meta4"
     .\bin\aria2c.exe -c -R --retry-wait=5 --check-certificate=false -x16 -s16 -j5 -d ".\patch" -M ".\temp\WUScript.meta4"
-    if (!$?) { Write-Error "WUScript Download Failed!" }
+    if (!$?) { Write-Error "WUScript 下载失败！" }
 } else {
-    Write-Error "No Windows Update Scripts Found!"
+    Write-Error "未找到 Windows 更新脚本！"
 }
 if ($null -ne $NETScript) {
     Invoke-WebRequest -Uri $NETScript -OutFile ".\temp\NETScript.meta4"
     .\bin\aria2c.exe -c -R --retry-wait=5 --check-certificate=false -x16 -s16 -j5 -d ".\patch" -M ".\temp\NETScript.meta4" --metalink-language="neutral"
-    if (!$?) { Write-Error "NETScript Download Failed!" }
+    if (!$?) { Write-Error "NETScript 下载失败！" }
     .\bin\aria2c.exe -c -R --retry-wait=5 --check-certificate=false -x16 -s16 -j5 -d ".\patch" -M ".\temp\NETScript.meta4" --metalink-language="zh-CN"
-    if (!$?) { Write-Error "NETScript Download Failed!" }
+    if (!$?) { Write-Error "NETScript 下载失败！" }
 }
-# Convert WIM+PSF to msu
+# 将 WIM+PSF 转换为 msu
 # Link: https://github.com/abbodi1406/BatUtil/issues/49
 # if (Test-Path ".\patch\Windows*.wim") {
 #     $patchPath = Resolve-Path ".\patch"
-#     Write-Host "Making MSU ($patchPath)..."
+#     Write-Host "正在制作 MSU ($patchPath)..."
 #     Invoke-WebRequest -Uri 'https://github.com/abbodi1406/WHD/raw/refs/heads/master/scripts/PSFX_MSU_5.zip' -OutFile .\temp\PSFX_MSU.zip
 #     Expand-Archive -Path .\temp\PSFX_MSU.zip -DestinationPath .\temp\PSFX_MSU -Force
 #     . ".\temp\PSFX_MSU\PSFX2MSU.cmd" "$patchPath"
 # }
 
-# get fod
+# 获取按需功能 (FOD)
 if ($null -ne $Miracast) {
     # Microsoft-Windows-WirelessDisplay-FOD-Package.cab
     Invoke-Aria2Download -Uri $Miracast -Destination ".\fod\Miracast\" -Name "update.cab"
@@ -573,7 +573,7 @@ if ($null -ne $iexplorerLP) {
     Invoke-Aria2Download -Uri $iexplorerLP -Destination ".\fod\iexplorerLP\" -Name "update.cab"
     expand -f:* ".\fod\iexplorerLP\update.cab" ".\fod\iexplorerLP\" >nul
 }
-# get entg
+# 获取企业版 G 包
 if (($null -ne $entgpack) -and ($true -eq $MultiEdition)) {
     # Microsoft-Windows-EditionSpecific-EnterpriseG-Package.ESD
     Invoke-Aria2Download -Uri $entgpack -Destination ".\temp\" -Name "entg.esd"
@@ -585,7 +585,7 @@ if (($null -ne $entgLP) -and ($true -eq $MultiEdition)) {
     ."C:\Program Files\7-Zip\7z.exe" x ".\temp\entgLP.esd" -o".\entgLP" -r
 }
 
-# get msstore
+# 获取应用商店组件
 $MSStoreScript = "echo nostore"
 if ($true -eq $msstore) {
     Remove-Item -Path "$PSScriptRoot\msstore" -Force -ErrorAction SilentlyContinue
@@ -612,35 +612,35 @@ for %%a in (%~dp0msstore\Microsoft.WindowsTerminal*.Msixbundle) do call :Add-Pro
 }
 
 if ($true -eq $SkipCheck) { 
-    # get appraiserres.dll from Windows 10 19041 latest setup
+    # 从 Windows 10 19041 最新安装程序获取 appraiserres.dll
     Invoke-WebRequest -Uri "https://github.com/user-attachments/files/17200856/appraiserres.zip" -OutFile ".\temp\appraiserres.zip"
     Expand-Archive -Path ".\temp\appraiserres.zip" -DestinationPath ".\temp"
 }
 if ($null -eq $Cleanup) { $Cleanup = $true }
 
-# abbodi1406/W10UI, auto inject hook
+# abbodi1406/W10UI, 自动注入钩子
 $W10UI = "@chcp 65001`n"
 $W10UI += (Invoke-WebRequest -Uri "https://github.com/abbodi1406/BatUtil/raw/refs/heads/master/W10UI/W10UI.cmd").Content
 $W10UI = $W10UI.Replace("if %AddDrivers%==1 call :doDrv", "call %~dp0hook_beforewim.cmd`nif %AddDrivers%==1 call :doDrv")
 $W10UI = $W10UI.Replace("if %net35%==1 call :enablenet35", "call %~dp0hook_beforenet35.cmd`nif %net35%==1 call :enablenet35")
 
-# write beforenet35 hook script
+# 写入 beforenet35 钩子脚本
 @"
 echo.
 echo ============================================================
-echo Hook W10UI beforenet35 Successfully!
-echo Current Dir: %cd%
-echo Mount Dir: !mountdir!
-echo DISM Target: %dismtarget%
-echo Cab Dir: !_cabdir!
+echo 钩子 W10UI beforenet35 执行成功！
+echo 当前目录: %cd%
+echo 挂载目录: !mountdir!
+echo DISM 目标: %dismtarget%
+echo Cab 目录: !_cabdir!
 echo MumTarget: !mumtarget!
-echo Arch: %arch%
+echo 架构: %arch%
 echo ============================================================
 
 if exist "!mumtarget!\Windows\Servicing\Packages\*WinPE-LanguagePack*.mum" (
     echo.
     echo ============================================================
-    echo Skipping for WinPE image...
+    echo 跳过 WinPE 镜像...
     echo ============================================================
     goto :eof
 )
@@ -648,27 +648,27 @@ if exist "!mumtarget!\Windows\Servicing\Packages\*WinPE-LanguagePack*.mum" (
 if exist "!mountdir!\Windows\WinSxS\*microsoft-edge-webview*" (
     echo.
     echo ============================================================
-    echo Removing Edge WebView2 FOD...
+    echo 正在移除 Edge WebView2 FOD...
     echo ============================================================
     %_dism2%:"!_cabdir!" %dismtarget% /Remove-Capability /CapabilityName:"Edge.WebView2.Platform~~~~"   
 )
 "@ | Out-File -FilePath ".\hook_beforenet35.cmd"
 
-# write beforewim hook script
+# 写入 beforewim 钩子脚本
 @"
 echo.
 echo ============================================================
-echo Hook W10UI beforewim Successfully!
-echo Current Dir: %cd%
-echo Mount Dir: !mountdir!
-echo DISM Target: %dismtarget%
-echo Cab Dir: !_cabdir!
+echo 钩子 W10UI beforewim 执行成功！
+echo 当前目录: %cd%
+echo 挂载目录: !mountdir!
+echo DISM 目标: %dismtarget%
+echo Cab 目录: !_cabdir!
 echo MumTarget: !mumtarget!
-echo Arch: %arch%
+echo 架构: %arch%
 echo ============================================================
 
 if /i "$SkipCheck"=="true" (
-    echo skip hardware check by reg
+    echo 通过注册表跳过硬件检测
     REG.exe LOAD "HKLM\Mount_SYSTEM" "!mountdir!\Windows\System32\config\SYSTEM"
     for %%a in (BypassCPUCheck,BypassRAMCheck,BypassSecureBootCheck,BypassStorageCheck,BypassTPMCheck) do (
         REG.exe ADD "HKLM\Mount_SYSTEM\Setup\LabConfig" /f /v "%%a" /t REG_DWORD /d 1
@@ -676,7 +676,7 @@ if /i "$SkipCheck"=="true" (
     REG.exe ADD "HKLM\Mount_SYSTEM\Setup\MoSetup" /f /v "AllowUpgradesWithUnsupportedTPMOrCPU" /t REG_DWORD /d 1
     REG.exe UNLOAD "HKLM\Mount_SYSTEM"
 
-    echo skip oobe force-login check
+    echo 跳过 OOBE 强制登录检测
     REG.exe LOAD "HKLM\Mount_SOFTWARE" "!mountdir!\Windows\System32\config\SOFTWARE"
     REG.exe ADD "HKLM\Mount_SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE" /v "BypassNRO" /t REG_DWORD /d "1" /f
     REG.exe DELETE "HKLM\Mount_SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\CompatMarkers" /f
@@ -685,7 +685,7 @@ if /i "$SkipCheck"=="true" (
     REG.exe ADD "HKLM\Mount_SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\HwReqChk" /v "HwReqChkVars" /t REG_MULTI_SZ /d "SQ_SSE2ProcessorSupport=TRUE\0SQ_SSE4_2ProcessorSupport=TRUE\0SQ_NXProcessorSupport=TRUE\0SQ_CompareExchange128=TRUE\0SQ_LahfSahfSupport=TRUE\0SQ_PrefetchWSupport=TRUE\0SQ_PopCntInstructionSupport=TRUE\0SQ_SecureBootCapable=TRUE\0SQ_SecureBootEnabled=TRUE\0SQ_TpmVersion=2\0SQ_RamMB=9999\0SQ_SystemDiskSizeMB=99999\0SQ_CpuCoreCount=9\0SQ_CpuModel=99\0SQ_CpuFamily=99\0SQ_CpuMhz=9999" /f
     REG.exe UNLOAD "HKLM\Mount_SOFTWARE"
     
-    echo skip personal data export check for cn
+    echo 跳过中国版个人数据导出检测
     REG LOAD "HKLM\Mount_Default" "!mountdir!\Users\Default\NTUSER.DAT"
     REG ADD "HKLM\Mount_Default\Software\Microsoft\Windows\CurrentVersion\CloudExperienceHost\Intent\PersonalDataExport" /f /v "PDEShown" /t REG_DWORD /d 2
     REG UNLOAD "HKLM\Mount_Default"
@@ -694,14 +694,14 @@ if /i "$SkipCheck"=="true" (
 if exist "!mountdir!\Windows\Servicing\Packages\*WinPE-LanguagePack*.mum" (
     echo.
     echo ============================================================
-    echo Hook does not operate for WinPE, exiting...
+    echo 钩子不对 WinPE 操作，正在退出...
     echo ============================================================
     exit /b
 )
 
 echo.
 echo ============================================================
-echo Enable Features...
+echo 启用功能...
 echo ============================================================
 
 %_dism2%:"!_cabdir!" %dismtarget% /Enable-Feature:LegacyComponents /All
@@ -711,10 +711,10 @@ echo ============================================================
 
 echo.
 echo ============================================================
-echo Adding Features on Demands...
+echo 添加按需功能...
 echo ============================================================
 
-echo current dir: %cd%
+echo 当前目录: %cd%
 
 if exist "%~dp0fod\Miracast\update.mum" (
     %_dism2%:"!_cabdir!" %dismtarget% /Add-Package /PackagePath:"%~dp0fod\Miracast\update.mum" 
@@ -728,7 +728,7 @@ if exist "%~dp0fod\iexplorerLP\update.mum" (
 )
 echo.
 echo ============================================================
-echo Updating Microsoft Store...
+echo 正在更新 Microsoft Store...
 echo ============================================================
 
 $MSStoreScript
@@ -737,19 +737,19 @@ if /i not "$MultiEdition"=="true" EXIT /B
 
 echo.
 echo ============================================================
-echo Commiting Base-Edition...
+echo 正在提交基础版本...
 echo ============================================================
 %_dism2%:"!_cabdir!" /Commit-Image /MountDir:"!mountdir!"
 
 
 echo.
 echo ============================================================
-echo Getting Current-Edition...
+echo 正在获取当前版本...
 echo ============================================================
 %_dism2%:"!_cabdir!" %dismtarget% /Get-CurrentEdition | find /i "CoreCountrySpecific" && goto :makefromccs
 %_dism2%:"!_cabdir!" %dismtarget% /Get-CurrentEdition | find /i "EnterpriseS" && goto :makefroments
 echo.
-echo Your current edition is not supported, exiting...
+echo 当前版本不支持，正在退出...
 set discard=1
 EXIT /B
 
@@ -757,7 +757,7 @@ EXIT /B
 :makefromccs
 echo.
 echo ============================================================
-echo Converting Multi-Edition from CoreCountrySpecific...
+echo 从 CoreCountrySpecific 转换多版本...
 echo ============================================================
 call :makemulti Core
 call :makemulti CoreSingleLanguage
@@ -774,36 +774,36 @@ EXIT /B
 :makefroments
 echo.
 echo ============================================================
-echo Converting Multi-Edition from EnterpriseS...
+echo 从 EnterpriseS 转换多版本...
 echo ============================================================
 FOR /F "tokens=3 delims=: " %%a in ('%_dism2%:"!_cabdir!" %dismtarget% /Get-TargetEditions ^| find /i "Target Edition : "') do (
-    echo Convertable Edition: %%a
+    echo 可转换版本: %%a
     call :makemulti %%a
 )
 set discard=1
 EXIT /B
 
 :Add-ProvisionedAppxPackage
-echo installing - %~n1
+echo 正在安装 - %~n1
 %_dism2%:"!_cabdir!" %dismtarget% /Add-ProvisionedAppxPackage /PackagePath:"%~1" /SkipLicense /Region:all
 goto :EOF
 
 :makemulti
 echo.
 echo ============================================================
-echo Coverting Edition - %1...
+echo 正在转换版本 - %1...
 echo ============================================================
 %_dism2%:"!_cabdir!" %dismtarget% /Set-Edition:%1
 if !errorlevel! equ 0 (
     echo.
     echo ============================================================
-    echo Commiting Edition - %1...
+    echo 正在提交版本 - %1...
     echo ============================================================
     %_dism2%:"!_cabdir!" /Commit-Image /MountDir:"!mountdir!" /Append
 ) else (
     echo.
     echo ============================================================
-    echo Coverting Edition - %1 Failed!
+    echo 转换版本 - %1 失败！
     echo ============================================================
 )
 goto :EOF
@@ -811,14 +811,14 @@ goto :EOF
 :makeEntG
 echo.
 echo ============================================================
-echo Making EnterpriseG Version...
+echo 正在制作企业版 G...
 echo ============================================================
 
 echo.
 echo ============================================================
-echo Installing EnterpriseG Package...
+echo 正在安装企业版 G 包...
 echo.
-echo Note: If errors occur, it is normal.
+echo 注意: 如果出现错误，属于正常现象。
 echo ============================================================
 %_dism2%:"!_cabdir!" %dismtarget% /Set-Edition:Enterprise
 FOR %%a IN (%~dp0entg\*.mum) DO %_dism2%:"!_cabdir!" %dismtarget% /Add-Package /PackagePath:"%%a"
@@ -827,16 +827,16 @@ FOR %%a IN (%~dp0entgLP\*-EnterpriseG-*.mum) DO %_dism2%:"!_cabdir!" %dismtarget
 
 echo.
 echo ============================================================
-echo Copying servicing Packages...
+echo 正在复制服务包...
 echo.
-echo Note: If errors occur, it must be 100% faild.
+echo 注意: 如果出现错误，则必定100%失败。
 echo ============================================================
 for /d %%a in ("!_cabdir!\*") do for %%b in ("%%a\Microsoft-Windows-EnterpriseGEdition~*") do copy /y "%%~b" "!mountdir!\Windows\servicing\Packages"
 for /d %%a in ("!_cabdir!\*") do for %%b in ("%%a\Microsoft-Windows-EnterpriseGEdition-wrapper~*") do copy /y "%%~b" "!mountdir!\Windows\servicing\Packages"
 
 echo.
 echo ============================================================
-echo Getting informartion from registry...
+echo 正在从注册表获取信息...
 echo ============================================================
 REG.exe LOAD HKLM\EntGSOFTWARE "!mountdir!\Windows\System32\config\SOFTWARE"
 
@@ -855,9 +855,9 @@ FOR /F "tokens=*" %%i IN ('REG QUERY "HKLM\EntGSOFTWARE\Microsoft\Windows\Curren
 
 echo.
 echo ============================================================
-echo Adding Edition Package informartion to the registry...
+echo 正在向注册表添加版本包信息...
 echo.
-echo TargetArchitecture: %_target_arch%
+echo 目标架构: %_target_arch%
 echo EntGEditionVersion: %EntGEditionVersion%
 echo InstallTimeHigh: %InstallTimeHigh%
 echo InstallTimeLow: %InstallTimeLow%
@@ -881,7 +881,7 @@ REG.exe UNLOAD HKLM\EntGSOFTWARE
 
 echo.
 echo ============================================================
-echo Setting key and license...
+echo 正在设置产品密钥和许可证...
 echo ============================================================
 %_dism2%:"!_cabdir!" %dismtarget% /Set-ProductKey:FV469-WGNG4-YQP66-2B2HY-KD8YX
 %_dism2%:"!_cabdir!" %dismtarget% /Get-CurrentEdition
@@ -900,21 +900,21 @@ for /F "tokens=3" %%a in ('%wimlib% info "%filename%" ^| findstr /C:"Image Count
 for /L %%# in (1,1,%ImageCount%) do call :editwiminfo %%#
 
 if /i "$SkipCheck"=="true" (
-    echo change installation type to server
+    echo 将安装类型更改为服务器版
     for /L %%# in (1,1,%ImageCount%) do (
         %wimlib% info "%filename%" %%# --image-property WINDOWS/INSTALLATIONTYPE=Server
     )
 
-    echo write ei.cfg
+    echo 写入 ei.cfg
     >ISO\sources\ei.cfg echo [Channel]
     >>ISO\sources\ei.cfg echo _Default
     >>ISO\sources\ei.cfg echo [VL]
     >>ISO\sources\ei.cfg echo 0
 
-    echo replace appraiserres.dll to windows 10 19041 setup
+    echo 将 appraiserres.dll 替换为 Windows 10 19041 安装程序版本
     copy /y "temp\appraiserres.dll" "ISO\sources\appraiserres.dll"
 
-    echo write 4+1+1 batch file to ISO root path
+    echo 将 4+1+1 批处理文件写入 ISO 根目录
     >ISO\SkipCheck.cmd echo REG.exe ADD "HKLM\SYSTEM\Setup\LabConfig" /v "BypassTPMCheck" /t REG_DWORD /d "1" /f
     >>ISO\SkipCheck.cmd echo REG.exe ADD "HKLM\SYSTEM\Setup\LabConfig" /v "BypassSecureBootCheck" /t REG_DWORD /d "1" /f
     >>ISO\SkipCheck.cmd echo REG.exe ADD "HKLM\SYSTEM\Setup\LabConfig" /v "BypassRAMCheck" /t REG_DWORD /d "1" /f
@@ -964,14 +964,14 @@ goto :eof
 "@ | Out-File -FilePath ".\hook_beforedvd.cmd"
 }
 
-# write W10UI
+# 写入 W10UI
 $W10UI | Out-File -FilePath ".\W10UI.cmd" -Encoding utf8
 $W10UI = ""
 
-# get osimage
-# get original system direct link
+# 获取系统镜像
+# 获取原始系统直链
 if ($null -ne $os_path) {
-    Write-Host "Get Original System Image Link for $os_path..."
+    Write-Host "获取原始系统镜像链接: $os_path..."
     $obj = Invoke-RestMethod -Uri "https://list.xrgzs.top/api/fs/get" `
         -Method "POST" `
         -ContentType "application/json;charset=UTF-8" `
@@ -980,21 +980,21 @@ if ($null -ne $os_path) {
             password = ""
         } | Convertto-Json)
     if ($obj.data.name -and $obj.data.raw_url) {
-        Write-Host "Get $($obj.data.name): $($obj.data.raw_url)"
+        Write-Host "获取 $($obj.data.name): $($obj.data.raw_url)"
         $os_file = $obj.data.name
         $os_url = $obj.data.raw_url
     } else {
-        Write-Error "Get Original System Image Failed! $($obj | ConvertTo-Json)"
+        Write-Error "获取原始系统镜像失败！$($obj | ConvertTo-Json)"
     }
 }
-Write-Host "Original system file: $os_file
-Original system download link: $os_url
+Write-Host "原始系统文件: $os_file
+原始系统下载链接: $os_url
 "
 
-Write-Host "Downloading original system image..."
+Write-Host "正在下载原始系统镜像..."
 Invoke-Aria2Download -Uri $os_url -Destination ".\temp\" -Name $os_file -Big
 
-Write-Host "Verifying hash of original system image..."
+Write-Host "正在校验原始系统镜像哈希..."
 
 if ($os_md5) {
     Test-MD5 @{".\temp\$os_file" = $os_md5 }
@@ -1005,7 +1005,7 @@ if ($os_md5) {
 # Target        =${isomount}:
 ."C:\Program Files\7-Zip\7z.exe" x ".\temp\$os_file" -o".\ISO" -r
 
-# select 1 edition only
+# 仅选择1个版本
 # if ($null -ne $SelectEdition) {
 #     .\bin\wimlib-imagex.exe info ".\ISO\sources\install.wim" --extract-xml ".\temp\WIMInfo.xml"
 #     $WIMInfo = [xml](Get-Content ".\temp\WIMInfo.xml")
@@ -1022,7 +1022,7 @@ if ($os_md5) {
 
 .\bin\wimlib-imagex.exe info ".\ISO\sources\install.wim" --extract-xml ".\temp\WIMInfo2.xml"
 Get-Content ".\temp\WIMInfo2.xml"
-# write W10UI conf
+# 写入 W10UI 配置
 @"
 [W10UI-Configuration]
 Target        =%cd%\ISO
@@ -1056,17 +1056,17 @@ AddDrivers    =0
 Drv_Source    =\Drivers
 "@ | Out-File -FilePath ".\W10UI.ini"
 
-# execute W10UI script
+# 执行 W10UI 脚本
 .\W10UI.cmd
 
-# ensure iso exists
+# 确保 ISO 文件存在
 $isoFiles = Get-ChildItem -Path ".\*.iso" -File
 if (-not $isoFiles) {
-    Write-Error "No ISO files found in the directory. Please ensure the script has generated the ISO files correctly."
+    Write-Error "目录中未找到 ISO 文件，请确保脚本已正确生成 ISO 文件。"
     exit 1
 }
 
-# rename
+# 重命名
 $isoFiles | ForEach-Object {
     $NewName = $_.Name
     if ($os_edition -like "*LTS*") {
@@ -1095,9 +1095,9 @@ $isoFiles | ForEach-Object {
     }
 }
 
-# get hash
+# 获取哈希
 Get-ChildItem -Path ".\*.iso" -File | ForEach-Object {
-    Write-Host "Getting hash for $($_.Name)..."
+    Write-Host "正在获取 $($_.Name) 的哈希..."
     $FileInfo = [ordered] @{}
     $FileInfo.uuid = [guid]::NewGuid().ToString()
     $FileInfo.name = $_.Name

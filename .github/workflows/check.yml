@@ -3,7 +3,7 @@ run-name: Check UUPDUMP ${{ inputs.DatabaseOnly == true && '(DatabaseOnly)' || '
 
 on:
   schedule:
-    # Runs at 20 minutes past the hour, every 12 hours, starting at 04:00.
+    # 每12小时运行一次，在第20分钟，从04:00开始
     - cron: "20 4/12 * * *"
   workflow_dispatch:
     inputs:
@@ -35,7 +35,7 @@ jobs:
       #             Set-DnsClientServerAddress -InterfaceIndex $adapter.ifIndex -ResetServerAddresses
       #             Set-DnsClientServerAddress -InterfaceIndex $adapter.ifIndex -ServerAddresses $newDnsServers
       #         } catch {
-      #             Write-Host "Failed to set DNS for adapter $($adapter.Name): $_"
+      #             Write-Host "为适配器 $($adapter.Name) 设置 DNS 失败: $_"
       #         }
       #     }
       #     ipconfig /flushdns
@@ -43,23 +43,23 @@ jobs:
       # - name: Install Cloudflare WRAP
       #   shell: pwsh
       #   run: |
-      #     Write-Host "installing Cloudflare WARP..."
+      #     Write-Host "正在安装 Cloudflare WARP..."
       #     Invoke-WebRequest -Uri "https://1111-releases.cloudflareclient.com/win/latest" -OutFile "C:\cfwarp.msi"
       #     Start-Process "msiexec.exe" -ArgumentList "/i C:\cfwarp.msi /qn" -Wait
       #     . "C:\Program Files\Cloudflare\Cloudflare WARP\warp-cli.exe" registration new
       #     . "C:\Program Files\Cloudflare\Cloudflare WARP\warp-cli.exe" connect
-      #     # Add a loop to wait for the status to be connected
+      #     # 添加循环等待连接状态
       #     for ($attemptCount = 0; $attemptCount -lt 10; $attemptCount++) {
       #         $output = . "C:\Program Files\Cloudflare\Cloudflare WARP\warp-cli.exe" status
       #         Write-Host $output
       #         if ($output -like "*Status update: Connected*") {
       #             break
       #         }
-      #         Start-Sleep -Seconds 5  # Wait for 5 seconds before checking again
+      #         Start-Sleep -Seconds 5  # 等待5秒后再次检查
       #     }
       #     if ($attemptCount -eq 10) {
-      #         Write-Host "Failed to connect after 10 attempts."
-      #         exit 1  # Exit with an error code
+      #         Write-Host "10次尝试后连接失败。"
+      #         exit 1  # 以错误码退出
       #     }
 
       - name: Small Task
@@ -77,7 +77,7 @@ jobs:
       #               . "C:\Program Files\Cloudflare\Cloudflare WARP\warp-cli.exe" disconnect
       #           }
       #           catch {
-      #               Write-Warning "Failed to disconnect Cloudflare WARP"
+      #               Write-Warning "断开 Cloudflare WARP 失败"
       #           }
       #       }
 

@@ -2,7 +2,7 @@
 Import-Module Pester
 
 BeforeAll {
-    # Import the module to test
+    # 导入待测试的模块
     Import-Module "$PSScriptRoot/request.psm1"
 }
 
@@ -11,37 +11,37 @@ AfterAll {
 }
 
 Describe "Request-Update" {
-    Context "When QueryString is regex pattern" {
-        It "Should return version in format number.number" {
+    Context "当 QueryString 为正则表达式模式时" {
+        It "应返回 number.number 格式的版本号" {
             $result = Request-Update -QueryString "regex:^(?:(?!Insider|Server|HCI).)*26100"
             $result | Should -Match '^26100\.\d+$'
         }
     }
 
-    Context "When Category is w11-24h2" {
-        It "Should return version in format number.number" {
+    Context "当 Category 为 w11-24h2 时" {
+        It "应返回 number.number 格式的版本号" {
             $result = Request-Update -Category "w11-24h2"
             $result | Should -Match '^26100\.\d+$'
         }
     }
 
-    Context "When Category is w10-22h2" {
-        It "Should return version in format number.number" {
+    Context "当 Category 为 w10-22h2 时" {
+        It "应返回 number.number 格式的版本号" {
             $result = Request-Update -Category "w10-22h2"
             $result | Should -Match '^19045\.\d+$'
         }
     }
 
-    Context "When Category is w11-19h2" {
-        It "Should throw an error" {
+    Context "当 Category 为 w11-19h2 时" {
+        It "应抛出错误" {
             { Request-Update -Category "w11-19h2" } | Should -Throw
         }
     }
 }
 
 Describe "Get-UUPFiles" {
-    Context "When Id is provided" {
-        It "Should return non-null hashtable" {
+    Context "当提供 Id 时" {
+        It "应返回非空的哈希表" {
             $result = Get-UUPFiles -Id "8c10c883-071c-43c3-bff8-8ed82fba2436"
             $result | Should -Not -Be $null
             $result | Should -BeOfType 'System.Collections.Hashtable'
@@ -51,8 +51,8 @@ Describe "Get-UUPFiles" {
 }
 
 Describe "Get-UUPFile" {
-    Context "When Id and FileName are provided" {
-        It "Should return file details" {
+    Context "当提供 Id 和 FileName 时" {
+        It "应返回文件详情" {
             $fileName = "Microsoft-Windows-WirelessDisplay-FOD-Package-x86.cab"
             $result = Get-UUPFile -Id "8c10c883-071c-43c3-bff8-8ed82fba2436" -FileName $fileName
             $result | Should -Not -Be $null
@@ -61,11 +61,11 @@ Describe "Get-UUPFile" {
             $result.size | Should -BeGreaterThan 0
             $result.sha1 | Should -Match '^[a-fA-F0-9]{40}$'
         }
-        It "Should hit the cache on second call" {
+        It "第二次调用应命中缓存" {
             $fileName = "Microsoft-Windows-WirelessDisplay-FOD-Package-x86.cab"
-            # First call to populate cache
+            # 第一次调用填充缓存
             $null = Get-UUPFile -Id "8c10c883-071c-43c3-bff8-8ed82fba2436" -FileName $fileName
-            # Second call should hit cache
+            # 第二次调用应命中缓存
             $result = Get-UUPFile -Id "8c10c883-071c-43c3-bff8-8ed82fba2436" -FileName $fileName
             $result | Should -Not -Be $null
             $result | Should -BeOfType 'PSCustomObject'

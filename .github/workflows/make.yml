@@ -58,7 +58,7 @@ jobs:
       #             Set-DnsClientServerAddress -InterfaceIndex $adapter.ifIndex -ResetServerAddresses
       #             Set-DnsClientServerAddress -InterfaceIndex $adapter.ifIndex -ServerAddresses $newDnsServers
       #         } catch {
-      #             Write-Host "Failed to set DNS for adapter $($adapter.Name): $_"
+      #             Write-Host "为适配器 $($adapter.Name) 设置 DNS 失败: $_"
       #         }
       #     }
       #     ipconfig /flushdns
@@ -66,23 +66,23 @@ jobs:
       # - name: Install Cloudflare WRAP
       #   shell: pwsh
       #   run: |
-      #     Write-Host "installing Cloudflare WARP..."
+      #     Write-Host "正在安装 Cloudflare WARP..."
       #     Invoke-WebRequest -Uri "https://1111-releases.cloudflareclient.com/win/latest" -OutFile "C:\cfwarp.msi"
       #     Start-Process "msiexec.exe" -ArgumentList "/i C:\cfwarp.msi /qn" -Wait
       #     . "C:\Program Files\Cloudflare\Cloudflare WARP\warp-cli.exe" registration new
       #     . "C:\Program Files\Cloudflare\Cloudflare WARP\warp-cli.exe" connect
-      #     # Add a loop to wait for the status to be connected
+      #     # 添加循环等待连接状态
       #     for ($attemptCount = 0; $attemptCount -lt 10; $attemptCount++) {
       #         $output = . "C:\Program Files\Cloudflare\Cloudflare WARP\warp-cli.exe" status
       #         Write-Host $output
       #         if ($output -like "*Status update: Connected*") {
       #             break
       #         }
-      #         Start-Sleep -Seconds 5  # Wait for 5 seconds before checking again
+      #         Start-Sleep -Seconds 5  # 等待5秒后再次检查
       #     }
       #     if ($attemptCount -eq 10) {
-      #         Write-Host "Failed to connect after 10 attempts."
-      #         exit 1  # Exit with an error code
+      #         Write-Host "10次尝试后连接失败。"
+      #         exit 1  # 以错误码退出
       #     }
 
       - name: Big Task
@@ -102,7 +102,7 @@ jobs:
       #             . "C:\Program Files\Cloudflare\Cloudflare WARP\warp-cli.exe" disconnect
       #         }
       #         catch {
-      #             Write-Warning "Failed to disconnect Cloudflare WARP"
+      #             Write-Warning "断开 Cloudflare WARP 失败"
       #         }
       #     }
 
@@ -116,37 +116,37 @@ jobs:
       - name: Upload ISO to OneDrive
         shell: pwsh
         run: |
-          # Installing dependencies
+          # 安装依赖
           if (-not (Test-Path -Path ".\bin\rclone.conf")) {
-              Write-Error "rclone conf not found"
+              Write-Error "未找到 rclone 配置文件"
           }
           if (-not (Test-Path -Path ".\bin\rclone.exe")) {
-            Write-Host "rclone not found, downloading..."
+            Write-Host "未找到 rclone，正在下载..."
             Invoke-WebRequest -Uri 'https://downloads.rclone.org/rclone-current-windows-amd64.zip' -outfile .\temp\rclone.zip
             Expand-Archive -Path .\temp\rclone.zip -DestinationPath .\temp\ -Force
             Copy-Item -Path .\temp\rclone-*-windows-amd64\rclone.exe -Destination .\bin\rclone.exe
           }
-          # upload to cloud
+          # 上传到云端
           Get-ChildItem -Path ".\*.json" -File | ForEach-Object {
-            # read json
+            # 读取 json
             $json = Get-Content $_.FullName | Convertfrom-Json
 
             if (-not (Test-Path ".\$($json.name)")) {
-              throw "File not found!"
+              throw "未找到文件！"
             }
             
-            # upload iso
+            # 上传 iso
             
-            Write-Host "Uploading $(Resolve-Path $json.name) to ${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\$($json.os_version)..."
+            Write-Host "正在上传 $(Resolve-Path $json.name) 到 ${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\$($json.os_version)..."
             .\bin\rclone.exe copy "$(Resolve-Path $json.name)" "${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\$($json.os_version)" --progress
 
-            # upload json
-            Write-Host "Uploading $(Resolve-Path $_.FullName) to ${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\$($json.os_version)..."
+            # 上传 json
+            Write-Host "正在上传 $(Resolve-Path $_.FullName) 到 ${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\$($json.os_version)..."
             .\bin\rclone.exe copy "$(Resolve-Path $_.FullName)" "${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\$($json.os_version)" --progress
 
-            # upload non-skipcheck latest version json
+            # 上传非跳过检测的最新版本 json
             if ($json.msupdate.skipcheck -ne $true) {
-              Write-Host "Uploading $(Resolve-Path $_.FullName) to ${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\latest_$($json.os_arch).json..."
+              Write-Host "正在上传 $(Resolve-Path $_.FullName) 到 ${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\latest_$($json.os_arch).json..."
               .\bin\rclone.exe copyto "$(Resolve-Path $_.FullName)" "${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\latest_$($json.os_arch).json" --progress
             }
           }

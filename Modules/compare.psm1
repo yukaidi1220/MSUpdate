@@ -15,7 +15,7 @@ function Compare-Version {
         
         return $latest -gt $current
     } catch {
-        Write-Host -ForegroundColor Red "Failed to parse version: Current=$CurrentVersion, Latest=$LatestVersion"
+        Write-Host -ForegroundColor Red "版本解析失败: Current=$CurrentVersion, Latest=$LatestVersion"
         return $false
     }
 }

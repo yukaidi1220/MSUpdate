@@ -1,14 +1,14 @@
-name: Test PowerShell on Windows
+name: 在 Windows 上测试 PowerShell
 on: push
 
 jobs:
   pester-test:
-    name: Pester test
+    name: Pester 测试
     runs-on: windows-latest
     steps:
-      - name: Check out repository code
+      - name: 检出仓库代码
         uses: actions/checkout@v6
-      - name: Perform a Pester test from the Tests.ps1 file
+      - name: 从 Tests.ps1 文件执行 Pester 测试
         shell: pwsh
         run: |
           Invoke-Pester -Passthru
