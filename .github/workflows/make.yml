@@ -115,6 +115,7 @@ jobs:
 
       - name: 网络信息检查
         shell: bash
+        continue-on-error: true
         run: |
           echo "=== 网络信息 ==="
 

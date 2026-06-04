@@ -1031,10 +1031,10 @@ $W10UI = ""
 if ($null -ne $os_path) {
     Write-Host "获取原始系统镜像链接: $os_path..."
     $os_linkOk = $false
-    for ($attempt = 1; $attempt -le 3; $attempt++) {
+    for ($attempt = 1; $attempt -le 10; $attempt++) {
         $obj = $null
         try {
-            Write-Host "正在获取镜像链接 (尝试 $attempt/3)..." -ForegroundColor Cyan
+            Write-Host "正在获取镜像链接 (尝试 $attempt/10)..." -ForegroundColor Cyan
             $prevEAP = $ErrorActionPreference
             $ErrorActionPreference = 'Continue'
             try {
@@ -1049,7 +1049,7 @@ if ($null -ne $os_path) {
                 $ErrorActionPreference = $prevEAP
             }
         } catch {
-            Write-Warning "获取镜像链接失败 (尝试 $attempt/3): $($_.Exception.Message)"
+            Write-Warning "获取镜像链接失败 (尝试 $attempt/10): $($_.Exception.Message)"
         }
         if ($obj.data.name -and $obj.data.raw_url) {
             Write-Host "获取 $($obj.data.name): $($obj.data.raw_url)"
@@ -1058,12 +1058,12 @@ if ($null -ne $os_path) {
             $os_linkOk = $true
             break
         } else {
-            Write-Warning "获取原始系统镜像数据为空 (尝试 $attempt/3)"
+            Write-Warning "获取原始系统镜像数据为空 (尝试 $attempt/10)"
         }
-        if ($attempt -lt 3) { Start-Sleep -Seconds ($attempt * 3) }
+        if ($attempt -lt 10) { Start-Sleep -Seconds 3 }
     }
     if (-not $os_linkOk) {
-        Write-Error "获取原始系统镜像链接在 3 次尝试后仍然失败"
+        Write-Error "获取原始系统镜像链接在 10 次尝试后仍然失败"
     }
 }
 Write-Host "原始系统文件: $os_file
