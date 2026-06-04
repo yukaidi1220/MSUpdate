@@ -85,6 +85,34 @@ jobs:
       #         exit 1  # 以错误码退出
       #     }
 
+      - name: Pre-check rclone
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ github.repository_owner }}/rclone-action
+          token: ${{ secrets.RCLONE_TOKEN }}
+          path: _rclone_check
+
+      - name: Verify rclone config
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not (Test-Path "_rclone_check\rclone.conf")) {
+            throw "rclone.conf 未找到"
+          }
+          if (-not (Test-Path "_rclone_check\rclone.exe")) {
+            Write-Host "未找到 rclone，正在下载..."
+            Invoke-WebRequest -Uri 'https://downloads.rclone.org/rclone-current-windows-amd64.zip' -OutFile '_rclone_check\rclone.zip'
+            Expand-Archive -Path '_rclone_check\rclone.zip' -DestinationPath '_rclone_check\' -Force
+            Copy-Item -Path '_rclone_check\rclone-*-windows-amd64\rclone.exe' -Destination '_rclone_check\rclone.exe'
+          }
+          Write-Host "正在验证 rclone 配置和 RCLONE_PATH..."
+          Write-Host "RCLONE_PATH = ${{ vars.RCLONE_PATH }}"
+          & _rclone_check\rclone.exe --config _rclone_check\rclone.conf lsd "${{ vars.RCLONE_PATH }}"
+          if ($LASTEXITCODE -ne 0) {
+            throw "rclone lsd 失败，请检查 RCLONE_PATH 和 rclone.conf"
+          }
+          Write-Host "rclone 配置验证通过！" -ForegroundColor Green
+
       - name: Big Task
         shell: pwsh
         run: |
