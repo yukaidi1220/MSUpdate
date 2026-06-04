@@ -113,6 +113,42 @@ jobs:
           }
           Write-Host "rclone 配置验证通过！" -ForegroundColor Green
 
+      - name: 网络信息检查
+        shell: bash
+        run: |
+          echo "=== 网络信息 ==="
+
+          # Azure IMDS 获取区域
+          METADATA=$(curl -sS -H "Metadata:true" \
+            "http://169.254.169.254/metadata/instance?api-version=2021-02-01" \
+            --max-time 2 2>/dev/null) || true
+          if [ -n "$METADATA" ]; then
+            AZURE_LOCATION=$(echo "$METADATA" | jq -r '.compute.location // "未知"')
+            VM_SIZE=$(echo "$METADATA" | jq -r '.compute.vmSize // "未知"')
+            echo "Azure 区域: $AZURE_LOCATION"
+            echo "VM 大小: $VM_SIZE"
+          else
+            echo "Azure 区域: 不可用"
+          fi
+
+          # 获取 IPv4
+          IPV4=$(curl -sS "https://4.itdog.cn" --max-time 5 2>/dev/null) || true
+          echo "IPv4: ${IPV4:-获取失败}"
+
+          # 获取 IP 归属地
+          GEO=$(curl -sS "https://myip.ipip.net/json" --max-time 5 2>/dev/null) || true
+          if [ -n "$GEO" ]; then
+            RET=$(echo "$GEO" | jq -r '.ret // "fail"')
+            if [ "$RET" = "ok" ]; then
+              LOCATION=$(echo "$GEO" | jq -r '.data.location // [] | join(" ")')
+              echo "归属地: $LOCATION"
+            else
+              echo "归属地: 获取失败"
+            fi
+          else
+            echo "归属地: 获取失败"
+          fi
+
       - name: Big Task
         shell: pwsh
         run: |
