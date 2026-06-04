@@ -557,7 +557,7 @@ if ($UpdateFromUUP) {
     $UUPScript = "https://uupdump.net/get.php?id=$uupid&pack=0&edition=updateOnly&aria2=2"
     .\bin\aria2c.exe -c -R --retry-wait=5 --check-certificate=false -d ".\temp" -o "UUPScript.txt" "$UUPScript"
     if (!$?) { Write-Error "UUPScript 文件下载失败！" }
-    .\bin\aria2c.exe -c -R --retry-wait=5 --check-certificate=false -x16 -s16 -j5 -d ".\patch" -i ".\temp\UUPScript.txt"
+    .\bin\aria2c.exe -c -R --retry-wait=5 --check-certificate=false -x16 -s16 -j10 -d ".\patch" -i ".\temp\UUPScript.txt"
     if (!$?) { Write-Error "UUPScript 下载失败！" }
 } elseif ($null -ne $WUScript) {
     Invoke-RetryWebRequest -Uri $WUScript -OutFile ".\temp\WUScript.meta4"
