@@ -7,6 +7,35 @@ Import-Module "$PSScriptRoot\Modules\msstore.psm1"
 
 # 定义辅助函数
 
+function Invoke-RetryWebRequest {
+    param(
+        [Parameter(Mandatory = $true)][string]$Uri,
+        [Parameter(Mandatory = $true)][string]$OutFile,
+        [int]$MaxRetries = 3
+    )
+    for ($attempt = 1; $attempt -le $MaxRetries; $attempt++) {
+        try {
+            Write-Host "正在下载 $Uri (尝试 $attempt/$MaxRetries)..." -ForegroundColor Cyan
+            $prevEAP = $ErrorActionPreference
+            $ErrorActionPreference = 'Continue'
+            try {
+                Invoke-WebRequest -Uri $Uri -OutFile $OutFile -UseBasicParsing
+            } finally {
+                $ErrorActionPreference = $prevEAP
+            }
+            if (Test-Path $OutFile) {
+                Write-Host "下载成功: $OutFile" -ForegroundColor Green
+                return
+            }
+        } catch {
+            Write-Warning "下载失败 (尝试 $attempt/$MaxRetries): $($_.Exception.Message)"
+            if (Test-Path $OutFile) { Remove-Item $OutFile -Force }
+        }
+        if ($attempt -lt $MaxRetries) { Start-Sleep -Seconds ($attempt * 3) }
+    }
+    Write-Error "下载 $Uri 在 $MaxRetries 次尝试后仍然失败"
+}
+
 # 设置系统信息
 switch ($MakeVersion) {
     "w1126h1a64" {
@@ -496,7 +525,7 @@ if (-not (Test-Path -Path "C:\Program Files\7-Zip\7z.exe")) {
 }
 if (-not (Test-Path -Path ".\bin\aria2c.exe")) {
     Write-Host "未找到 aria2c，正在下载..."
-    Invoke-WebRequest -Uri 'https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0-win-64bit-build1.zip' -OutFile ".\temp\aria2.zip"
+    Invoke-RetryWebRequest -Uri 'https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0-win-64bit-build1.zip' -OutFile ".\temp\aria2.zip"
     Expand-Archive -Path ".\temp\aria2.zip" -DestinationPath ".\temp" -Force
     Move-Item -Path ".\temp\aria2-1.37.0-win-64bit-build1\aria2c.exe" -Destination ".\bin\aria2c.exe" -Force
 }
@@ -505,7 +534,7 @@ Test-SHA256 @{
 }
 if (-not (Test-Path -Path ".\bin\wimlib-imagex.exe")) {
     Write-Host "未找到 wimlib-imagex，正在下载..."
-    Invoke-WebRequest -Uri 'https://github.com/user-attachments/files/25449494/wimlib-1.14.5-windows-x86_64-bin.zip' -OutFile ".\temp\wimlib.zip"
+    Invoke-RetryWebRequest -Uri 'https://github.com/user-attachments/files/25449494/wimlib-1.14.5-windows-x86_64-bin.zip' -OutFile ".\temp\wimlib.zip"
     Expand-Archive -Path ".\temp\wimlib.zip" -DestinationPath ".\temp\wimlib" -Force
     Copy-Item -Path ".\temp\wimlib\wimlib-imagex.exe" -Destination ".\bin\wimlib-imagex.exe"
     Copy-Item -Path ".\temp\wimlib\libwim-15.dll" -Destination ".\bin\libwim-15.dll"
@@ -516,7 +545,7 @@ Test-SHA256 @{
 }
 if (-not (Test-Path -Path ".\bin\PSFExtractor.exe")) {
     Write-Host "未找到 PSFExtractor，正在下载..."
-    Invoke-WebRequest -Uri 'https://github.com/Secant1006/PSFExtractor/releases/download/v3.07/PSFExtractor-v3.07-x64.zip' -OutFile ".\temp\PSFExtractor.zip"
+    Invoke-RetryWebRequest -Uri 'https://github.com/Secant1006/PSFExtractor/releases/download/v3.07/PSFExtractor-v3.07-x64.zip' -OutFile ".\temp\PSFExtractor.zip"
     Expand-Archive -Path ".\temp\PSFExtractor.zip" -DestinationPath ".\bin" -Force
 }
 Test-SHA256 @{ 
@@ -531,14 +560,14 @@ if ($UpdateFromUUP) {
     .\bin\aria2c.exe -c -R --retry-wait=5 --check-certificate=false -x16 -s16 -j5 -d ".\patch" -i ".\temp\UUPScript.txt"
     if (!$?) { Write-Error "UUPScript 下载失败！" }
 } elseif ($null -ne $WUScript) {
-    Invoke-WebRequest -Uri $WUScript -OutFile ".\temp\WUScript.meta4"
+    Invoke-RetryWebRequest -Uri $WUScript -OutFile ".\temp\WUScript.meta4"
     .\bin\aria2c.exe -c -R --retry-wait=5 --check-certificate=false -x16 -s16 -j5 -d ".\patch" -M ".\temp\WUScript.meta4"
     if (!$?) { Write-Error "WUScript 下载失败！" }
 } else {
     Write-Error "未找到 Windows 更新脚本！"
 }
 if ($null -ne $NETScript) {
-    Invoke-WebRequest -Uri $NETScript -OutFile ".\temp\NETScript.meta4"
+    Invoke-RetryWebRequest -Uri $NETScript -OutFile ".\temp\NETScript.meta4"
     .\bin\aria2c.exe -c -R --retry-wait=5 --check-certificate=false -x16 -s16 -j5 -d ".\patch" -M ".\temp\NETScript.meta4" --metalink-language="neutral"
     if (!$?) { Write-Error "NETScript 下载失败！" }
     .\bin\aria2c.exe -c -R --retry-wait=5 --check-certificate=false -x16 -s16 -j5 -d ".\patch" -M ".\temp\NETScript.meta4" --metalink-language="zh-CN"
@@ -594,9 +623,15 @@ if ($true -eq $msstore) {
         # Get-Appx 'Microsoft.VCLibs.140.00'
         Invoke-Aria2Download -Uri "https://aka.ms/Microsoft.VCLibs.$os_arch.14.00.Desktop.appx" -Destination "$PSScriptRoot\msstore\Microsoft.VCLibs.140.00.msix"
     } else {
-        Get-Appx '9NBLGGH4NNS1' # 'Microsoft.DesktopAppInstaller'
-        Get-Appx '9WZDNCRFJBMP' # 'Microsoft.WindowsStore'
-        Get-Appx '9N0DX20HK701' # 'Microsoft.WindowsTerminal'
+        $prevEAP = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        try {
+            Get-Appx '9NBLGGH4NNS1' # 'Microsoft.DesktopAppInstaller'
+            Get-Appx '9WZDNCRFJBMP' # 'Microsoft.WindowsStore'
+            Get-Appx '9N0DX20HK701' # 'Microsoft.WindowsTerminal'
+        } finally {
+            $ErrorActionPreference = $prevEAP
+        }
     }
     $MSStoreScript = @"
 for %%a in (%~dp0msstore\Microsoft.VCLibs.140.00.UWPDesktop*.Appx) do call :Add-ProvisionedAppxPackage "%%a"
@@ -613,14 +648,33 @@ for %%a in (%~dp0msstore\Microsoft.WindowsTerminal*.Msixbundle) do call :Add-Pro
 
 if ($true -eq $SkipCheck) { 
     # 从 Windows 10 19041 最新安装程序获取 appraiserres.dll
-    Invoke-WebRequest -Uri "https://github.com/user-attachments/files/17200856/appraiserres.zip" -OutFile ".\temp\appraiserres.zip"
+    Invoke-RetryWebRequest -Uri "https://github.com/user-attachments/files/17200856/appraiserres.zip" -OutFile ".\temp\appraiserres.zip"
     Expand-Archive -Path ".\temp\appraiserres.zip" -DestinationPath ".\temp"
 }
 if ($null -eq $Cleanup) { $Cleanup = $true }
 
 # abbodi1406/W10UI, 自动注入钩子
 $W10UI = "@chcp 65001`n"
-$W10UI += (Invoke-WebRequest -Uri "https://github.com/abbodi1406/BatUtil/raw/refs/heads/master/W10UI/W10UI.cmd").Content
+for ($attempt = 1; $attempt -le 3; $attempt++) {
+    try {
+        Write-Host "正在获取 W10UI.cmd (尝试 $attempt/3)..." -ForegroundColor Cyan
+        $prevEAP = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        try {
+            $content = (Invoke-WebRequest -Uri "https://github.com/abbodi1406/BatUtil/raw/refs/heads/master/W10UI/W10UI.cmd" -UseBasicParsing).Content
+        } finally {
+            $ErrorActionPreference = $prevEAP
+        }
+        if ($content.Length -gt 100) {
+            $W10UI += $content
+            break
+        }
+    } catch {
+        Write-Warning "获取 W10UI.cmd 失败 (尝试 $attempt/3): $($_.Exception.Message)"
+        if ($attempt -eq 3) { Write-Error "获取 W10UI.cmd 在 3 次尝试后仍然失败" }
+        Start-Sleep -Seconds ($attempt * 3)
+    }
+}
 $W10UI = $W10UI.Replace("if %AddDrivers%==1 call :doDrv", "call %~dp0hook_beforewim.cmd`nif %AddDrivers%==1 call :doDrv")
 $W10UI = $W10UI.Replace("if %net35%==1 call :enablenet35", "call %~dp0hook_beforenet35.cmd`nif %net35%==1 call :enablenet35")
 $W10UI = $W10UI.Replace("--compress=LZMS --solid", "--compress=lzms:60 --solid --solid-chunk-size=128M --threads=5")
@@ -976,19 +1030,40 @@ $W10UI = ""
 # 获取原始系统直链
 if ($null -ne $os_path) {
     Write-Host "获取原始系统镜像链接: $os_path..."
-    $obj = Invoke-RestMethod -Uri "https://res.yukaidi.top/api/fs/get" `
-        -Method "POST" `
-        -ContentType "application/json;charset=UTF-8" `
-        -Body (@{
-            path     = $os_path
-            password = ""
-        } | Convertto-Json)
-    if ($obj.data.name -and $obj.data.raw_url) {
-        Write-Host "获取 $($obj.data.name): $($obj.data.raw_url)"
-        $os_file = $obj.data.name
-        $os_url = $obj.data.raw_url
-    } else {
-        Write-Error "获取原始系统镜像失败！$($obj | ConvertTo-Json)"
+    $os_linkOk = $false
+    for ($attempt = 1; $attempt -le 3; $attempt++) {
+        $obj = $null
+        try {
+            Write-Host "正在获取镜像链接 (尝试 $attempt/3)..." -ForegroundColor Cyan
+            $prevEAP = $ErrorActionPreference
+            $ErrorActionPreference = 'Continue'
+            try {
+                $obj = Invoke-RestMethod -Uri "https://res.yukaidi.top/api/fs/get" `
+                    -Method "POST" `
+                    -ContentType "application/json;charset=UTF-8" `
+                    -Body (@{
+                        path     = $os_path
+                        password = ""
+                    } | Convertto-Json)
+            } finally {
+                $ErrorActionPreference = $prevEAP
+            }
+        } catch {
+            Write-Warning "获取镜像链接失败 (尝试 $attempt/3): $($_.Exception.Message)"
+        }
+        if ($obj.data.name -and $obj.data.raw_url) {
+            Write-Host "获取 $($obj.data.name): $($obj.data.raw_url)"
+            $os_file = $obj.data.name
+            $os_url = $obj.data.raw_url
+            $os_linkOk = $true
+            break
+        } else {
+            Write-Warning "获取原始系统镜像数据为空 (尝试 $attempt/3)"
+        }
+        if ($attempt -lt 3) { Start-Sleep -Seconds ($attempt * 3) }
+    }
+    if (-not $os_linkOk) {
+        Write-Error "获取原始系统镜像链接在 3 次尝试后仍然失败"
     }
 }
 Write-Host "原始系统文件: $os_file

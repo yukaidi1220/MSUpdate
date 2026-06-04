@@ -141,7 +141,23 @@ function Get-StoreURLS {
 
   Write-Debug "Requesting cookie..."
 
-  $cookieResp = Invoke-RestMethod -Method Post -Body $Cookie -Uri $CookieURL -Headers $CookieHeader
+  $cookieResp = $null
+  for ($attempt = 1; $attempt -le 3; $attempt++) {
+    try {
+      $prevEAP = $ErrorActionPreference
+      $ErrorActionPreference = 'Continue'
+      try {
+        $cookieResp = Invoke-RestMethod -Method Post -Body $Cookie -Uri $CookieURL -Headers $CookieHeader
+      } finally {
+        $ErrorActionPreference = $prevEAP
+      }
+      if ($null -ne $cookieResp) { break }
+    } catch {
+      Write-Warning "获取 Cookie 失败 (尝试 $attempt/3): $($_.Exception.Message)"
+      if ($attempt -eq 3) { throw }
+      Start-Sleep -Seconds ($attempt * 2)
+    }
+  }
 
   Write-Debug "After cookieResp"
 
@@ -155,7 +171,23 @@ function Get-StoreURLS {
 
   Write-Debug "Requesting WUResp..."
 
-  $WUResp = Invoke-RestMethod -Method Post -Body $FinalWU -Headers $CookieHeader -Uri $WUURL
+  $WUResp = $null
+  for ($attempt = 1; $attempt -le 3; $attempt++) {
+    try {
+      $prevEAP = $ErrorActionPreference
+      $ErrorActionPreference = 'Continue'
+      try {
+        $WUResp = Invoke-RestMethod -Method Post -Body $FinalWU -Headers $CookieHeader -Uri $WUURL
+      } finally {
+        $ErrorActionPreference = $prevEAP
+      }
+      if ($null -ne $WUResp) { break }
+    } catch {
+      Write-Warning "获取 WUResp 失败 (尝试 $attempt/3): $($_.Exception.Message)"
+      if ($attempt -eq 3) { throw }
+      Start-Sleep -Seconds ($attempt * 2)
+    }
+  }
   #Write-Debug  "After WUResp"
 
   if ($null -ne $WUResp) {
@@ -203,7 +235,23 @@ function Get-StoreURLS {
   foreach ($obj in $objs) {
     $FinalFE3 = $FE3Req.Replace("{0}", $obj.UpdateID).replace("{1}", $obj.Revision).Replace("{2}", $release_type)
     Write-Debug "Requesting FE3Resp... UpdateID: $($obj.UpdateID), Revision: $($obj.Revision)"
-    $FE3Resp = Invoke-RestMethod -Uri $FE3URL -Method Post -Body $FinalFE3 -Headers $CookieHeader
+    $FE3Resp = $null
+    for ($attempt = 1; $attempt -le 3; $attempt++) {
+      try {
+        $prevEAP = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        try {
+          $FE3Resp = Invoke-RestMethod -Uri $FE3URL -Method Post -Body $FinalFE3 -Headers $CookieHeader
+        } finally {
+          $ErrorActionPreference = $prevEAP
+        }
+        if ($null -ne $FE3Resp) { break }
+      } catch {
+        Write-Warning "获取 FE3Resp 失败 (尝试 $attempt/3): $($_.Exception.Message)"
+        if ($attempt -eq 3) { throw }
+        Start-Sleep -Seconds ($attempt * 2)
+      }
+    }
 
     $URLS = $FE3Resp.getElementsByTagName("FileLocation")
     $URLS = $URLS | Sort-Object -Property Url
@@ -287,19 +335,37 @@ function Get-Appx {
         continue
       }
                 
-      try {
-        Write-Host "== 正在下载 $fileName" -ForegroundColor Green
-        Write-Debug "URL: $url"
-                    
-        Invoke-WebRequest -Uri $url -OutFile $filePath -UseBasicParsing
-        Write-Host "已下载: $fileName" -ForegroundColor Green
-      } catch {
-        Write-Error "下载 $fileName 失败: $($_.Exception.Message)"
+      $maxRetries = 3
+      for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
+        try {
+          Write-Host "== 正在下载 $fileName (尝试 $attempt/$maxRetries)" -ForegroundColor Green
+          Write-Debug "URL: $url"
+                      
+          $prevEAP = $ErrorActionPreference
+          $ErrorActionPreference = 'Continue'
+          try {
+            Invoke-WebRequest -Uri $url -OutFile $filePath -UseBasicParsing
+          } finally {
+            $ErrorActionPreference = $prevEAP
+          }
+          if (Test-Path $filePath) {
+            Write-Host "已下载: $fileName" -ForegroundColor Green
+            break
+          }
+        } catch {
+          Write-Warning "下载 $fileName 失败 (尝试 $attempt/$maxRetries): $($_.Exception.Message)"
+          if (Test-Path $filePath) { Remove-Item $filePath -Force }
+          if ($attempt -eq $maxRetries) {
+            Write-Error "下载 $fileName 在 $maxRetries 次尝试后仍然失败: $($_.Exception.Message)"
+          } else {
+            Start-Sleep -Seconds ($attempt * 3)
+          }
+        }
       }
     }
         
   } catch {
-    Write-Error "获取商店 URL 失败: $($_.Exception.Message)"
+    Write-Error "获取商店应用失败 ($ProductNumber): $($_.Exception.Message)"
   }
 }
 
