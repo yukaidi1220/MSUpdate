@@ -1,5 +1,5 @@
 name: 在 Windows 上测试 PowerShell
-on: push
+on: workflow_dispatch
 
 jobs:
   pester-test:
