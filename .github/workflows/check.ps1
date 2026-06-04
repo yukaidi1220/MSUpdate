@@ -15,8 +15,8 @@ if (-not (Get-Module -ListAvailable -Name powershell-yaml)) {
 }
 
 $StatePath = Join-Path '.' 'State.yml' -Resolve
-
-$CurrentState = Get-Content -Path $StatePath | ConvertFrom-Yaml -Ordered
+$StateContent = Get-Content -Path $StatePath -Raw
+$CurrentState = $StateContent | ConvertFrom-Yaml -Ordered
 
 foreach ($Category in $CurrentState.Keys) {
     $CurrentVersion = $CurrentState.$Category.Version
@@ -45,4 +45,16 @@ foreach ($Category in $CurrentState.Keys) {
     }
 }
 
-$CurrentState | ConvertTo-Yaml | Set-Content -Path $StatePath
+# 文本级别替换版本号，保留注释和格式
+foreach ($Category in $CurrentState.Keys) {
+    $NewVersion = $CurrentState.$Category.Version
+    $pattern = "(?m)(^$([regex]::Escape($Category)):\s*\r?\n\s*Version:\s*""?)[^""\r\n]+(""?\s*$)"
+    $replacement = "`${1}${NewVersion}`${2}"
+    $StateContent = [regex]::Replace($StateContent, $pattern, $replacement)
+}
+# 写回时保持原始文件的结尾换行状态
+if ($StateContent[-1] -eq "`n") {
+    Set-Content -Path $StatePath -Value $StateContent
+} else {
+    Set-Content -Path $StatePath -Value $StateContent -NoNewline
+}

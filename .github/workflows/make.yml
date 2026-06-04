@@ -9,22 +9,22 @@ on:
         type: choice
         options:
           - w1126h164
-          - w1126h1a64
+          # - w1126h1a64  # ARM64
           - w1125h264
-          - w1125h2a64
+          # - w1125h2a64  # ARM64
           - w1123h264
-          - w1123h2a64
+          # - w1123h2a64  # ARM64
           - w1022h264
-          - w1022h2a64
-          - w1022h232
+          # - w1022h2a64  # ARM64
+          # - w1022h232   # X86
           - w11lt2464
-          - w11lt24a64
+          # - w11lt24a64  # ARM64
           - w10lt2164
-          - w10lt2132
+          # - w10lt2132   # X86
           - w10lt1964
-          - w10lt1932
+          # - w10lt1932   # X86
           - w10lt1664
-          - w10lt1632
+          # - w10lt1632   # X86
       UpdateFromUUP:
         description: "从UUPDUMP获取更新(1809+)"
         required: false
@@ -139,7 +139,7 @@ jobs:
             # 上传 iso
             
             Write-Host "正在上传 $(Resolve-Path $json.name) 到 ${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\$($json.os_version)..."
-            .\bin\rclone.exe copy "$(Resolve-Path $json.name)" "${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\$($json.os_version)" --progress
+            .\bin\rclone.exe copy "$(Resolve-Path $json.name)" "${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\$($json.os_version)" --progress --onedrive-chunk-size 250M
 
             # 上传 json
             Write-Host "正在上传 $(Resolve-Path $_.FullName) 到 ${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\$($json.os_version)..."

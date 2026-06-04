@@ -623,6 +623,10 @@ $W10UI = "@chcp 65001`n"
 $W10UI += (Invoke-WebRequest -Uri "https://github.com/abbodi1406/BatUtil/raw/refs/heads/master/W10UI/W10UI.cmd").Content
 $W10UI = $W10UI.Replace("if %AddDrivers%==1 call :doDrv", "call %~dp0hook_beforewim.cmd`nif %AddDrivers%==1 call :doDrv")
 $W10UI = $W10UI.Replace("if %net35%==1 call :enablenet35", "call %~dp0hook_beforenet35.cmd`nif %net35%==1 call :enablenet35")
+$W10UI = $W10UI.Replace("--compress=LZMS --solid", "--compress=lzms:60 --solid --solid-chunk-size=128M --threads=5")
+if ($W10UI -notmatch '--compress=lzms:60') {
+    throw "W10UI.cmd 压缩参数替换失败，上游可能已更改写法"
+}
 
 # 写入 beforenet35 钩子脚本
 @"
