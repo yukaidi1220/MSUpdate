@@ -12,8 +12,10 @@ on:
           # - w1126h1a64  # ARM64
           - w1125h264
           # - w1125h2a64  # ARM64
+          - w1124h264
           - w1123h264
           # - w1123h2a64  # ARM64
+          - w1121h264
           - w1022h264
           # - w1022h2a64  # ARM64
           # - w1022h232   # X86
@@ -153,7 +155,7 @@ jobs:
       - name: Big Task
         shell: pwsh
         run: |
-          $MakeVersion   = [string] "${{ inputs.MakeVersion }}"
+          $MakeVersion   = [string] "${{ inputs.makeversion }}"
           $UpdateFromUUP = [bool]   $${{ inputs.UpdateFromUUP }}
           $MultiEdition  = [bool]   $${{ inputs.MultiEdition }}
           $SkipCheck     = [bool]   $${{ inputs.SkipCheck }}

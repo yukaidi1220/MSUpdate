@@ -251,6 +251,76 @@ switch ($MakeVersion) {
         }
         $msstore = $true
     }
+    "w1124h264" {
+        # 制作 Win11 24H2 消费版 X64
+        $os_ver = "11"
+        $os_rsversion = "24H2"
+        $os_build = "26100"
+        $os_edition = "CoreCountrySpecific"
+        $os_display = "Windows $os_ver $os_rsversion"
+        $os_arch = "x64"
+        $os_lang = "zh-cn"
+        $os_path = "/gslb/mupan/Origin_System/X23-81948_26100.1742.240906-0331.ge_release_svc_refresh_CLIENTCHINA_OEM_x64FRE_zh-cn.iso"
+        $os_md5 = "e5c05b0215d3e4af2f2fd4ea16252f91"
+        if ($true -eq $UpdateFromUUP) {
+            $uupid = (Invoke-UUPWebRequestLink `
+                    -Url "known.php?q=category:w11-24h2" `
+                    -LinkFilter @("*selectlang.php?id=*") `
+                    -ContentFilter @("*Windows 11,*amd64*") `
+                    -FirstLink
+            ).Replace("selectlang.php?id=", "")
+            $Miracast = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-WirelessDisplay-FOD-Package-amd64.cab"
+            $MiracastLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-WirelessDisplay-FOD-Package-amd64-zh-CN.cab"
+            $iexplorer = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-InternetExplorer-Optional-Package-amd64.cab"
+            $iexplorerLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-InternetExplorer-Optional-Package-amd64-zh-CN.cab"
+            $entgpack = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-EditionSpecific-EnterpriseG-Package.ESD"
+            $entgLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-Client-LanguagePack-Package-amd64-zh-CN.esd"
+        } else {
+            $WUScript = "https://raw.githubusercontent.com/adavak/Win_ISO_Patching_Scripts/master/Scripts/script_26100_x64.meta4"
+            $Miracast = "https://res.yukaidi.top/d/gslb/mupan/Fod_Packs/26100/amd64/Microsoft-Windows-WirelessDisplay-FOD-Package-amd64.cab"
+            $MiracastLP = "https://res.yukaidi.top/d/gslb/mupan/Fod_Packs/26100/amd64/Microsoft-Windows-WirelessDisplay-FOD-Package-amd64-zh-CN.cab"
+            $iexplorer = "https://res.yukaidi.top/d/gslb/mupan/Fod_Packs/26100/amd64/Microsoft-Windows-InternetExplorer-Optional-Package-amd64.cab"
+            $iexplorerLP = "https://res.yukaidi.top/d/gslb/mupan/Fod_Packs/26100/amd64/Microsoft-Windows-InternetExplorer-Optional-Package-amd64-zh-CN.cab"
+            $entgpack = "https://res.yukaidi.top/d/gslb/mupan/Fod_Packs/26100/amd64/Microsoft-Windows-EditionSpecific-EnterpriseG-Package.ESD"
+            $entgLP = "https://res.yukaidi.top/d/gslb/mupan/Fod_Packs/26100/amd64/Microsoft-Windows-Client-LanguagePack-Package-amd64-zh-CN.esd"
+        }
+        $msstore = $true
+    }
+    "w1121h264" {
+        # 制作 Win11 21H2 消费版 X64
+        $os_ver = "11"
+        $os_rsversion = "21H2"
+        $os_build = "22000"
+        $os_edition = "CoreCountrySpecific"
+        $os_display = "Windows $os_ver $os_rsversion"
+        $os_arch = "x64"
+        $os_lang = "zh-cn"
+        $os_path = "/gslb/mupan/Origin_System/Win11_China_GGK_Chinese(Simplified)_x64.iso"
+        $os_md5 = "c12988ca74168488100d940fcf8c60f8"
+        if ($true -eq $UpdateFromUUP) {
+            $uupid = (Invoke-UUPWebRequestLink `
+                    -Url "known.php?q=category:w11-21h2" `
+                    -LinkFilter @("*selectlang.php?id=*") `
+                    -ContentFilter @("*Windows 11*amd64*") `
+                    -FirstLink
+            ).Replace("selectlang.php?id=", "")
+            $Miracast = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-WirelessDisplay-FOD-Package-amd64.cab"
+            $MiracastLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-WirelessDisplay-FOD-Package-amd64-zh-cn.cab"
+            $iexplorer = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-InternetExplorer-Optional-Package-amd64.cab"
+            $iexplorerLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-InternetExplorer-Optional-Package-amd64-zh-cn.cab"
+            $entgpack = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-EditionSpecific-EnterpriseG-Package.ESD"
+            $entgLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-Client-LanguagePack-Package_zh-cn-amd64-zh-cn.esd"
+        } else {
+            $WUScript = "https://raw.githubusercontent.com/adavak/Win_ISO_Patching_Scripts/master/Scripts/script_22000_x64.meta4"
+            $Miracast = "https://res.yukaidi.top/d/gslb/mupan/Fod_Packs/22000/amd64/Microsoft-Windows-WirelessDisplay-FOD-Package-amd64.cab"
+            $MiracastLP = "https://res.yukaidi.top/d/gslb/mupan/Fod_Packs/22000/amd64/Microsoft-Windows-WirelessDisplay-FOD-Package-amd64-zh-CN.cab"
+            $iexplorer = "https://res.yukaidi.top/d/gslb/mupan/Fod_Packs/22000/amd64/Microsoft-Windows-InternetExplorer-Optional-Package-amd64.cab"
+            $iexplorerLP = "https://res.yukaidi.top/d/gslb/mupan/Fod_Packs/22000/amd64/Microsoft-Windows-InternetExplorer-Optional-Package-amd64-zh-CN.cab"
+            $entgpack = "https://res.yukaidi.top/d/gslb/mupan/Fod_Packs/22000/amd64/Microsoft-Windows-EditionSpecific-EnterpriseG-Package.ESD"
+            $entgLP = "https://res.yukaidi.top/d/gslb/mupan/Fod_Packs/22000/amd64/Microsoft-Windows-Client-LanguagePack-Package-amd64-zh-CN.esd"
+        }
+        $msstore = $true
+    }
     "w1022h2a64" {
         # 制作 Win10 22H2 ARM64
         $os_ver = "10"
