@@ -69,7 +69,7 @@ jobs:
       - name: Small Task
         shell: pwsh
         env:
-          GH_TOKEN: ${{ secrets.RCLONE_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           .\.github\workflows\check.ps1 ${{ inputs.DatabaseOnly == true && '-DatabaseOnly' || '' }}
 
