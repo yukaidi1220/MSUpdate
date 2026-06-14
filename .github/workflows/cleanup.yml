@@ -37,6 +37,7 @@ jobs:
           }
           if (-not (Test-Path -Path ".\bin\rclone.exe")) {
             Write-Host "未找到 rclone，正在下载..."
+            New-Item -Path '.\temp' -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
             Invoke-WebRequest -Uri 'https://downloads.rclone.org/rclone-current-windows-amd64.zip' -OutFile '.\temp\rclone.zip'
             Expand-Archive -Path '.\temp\rclone.zip' -DestinationPath '.\temp\' -Force
             Copy-Item -Path '.\temp\rclone-*-windows-amd64\rclone.exe' -Destination '.\bin\rclone.exe'
