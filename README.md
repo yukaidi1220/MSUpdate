@@ -109,6 +109,52 @@ DISM /Image:"挂载目录" /Get-CurrentEdition
 
 MSUpdate 现在使用 GitHub Actions 的 Windows Runner 进行自动构建，能持续获取到最新的 Windows 系统映像。
 
+### 自动化流水线
+
+项目包含以下自动化流水线，通过定时任务或手动触发实现全自动化的检测、构建和清理：
+
+| 流水线 | 文件 | 触发方式 | 说明 |
+|--------|------|----------|------|
+| 版本检测 | `check.yml` | 定时 + 手动 | 检测上游更新，自动触发构建 |
+| 镜像构建 | `make.yml` | 手动（或由 check 自动触发） | 集成更新并上传镜像 |
+| 版本清理 | `cleanup.yml` | 定时 + 手动 | 清理云端旧版本，释放空间 |
+
+#### 版本检测（check.yml）
+
+- **定时触发**：每天两次，北京时间 **12:20** 和 **00:20**（UTC 04:20 和 16:20）
+- **工作流程**：读取 `State.yml` 中记录的当前版本号，通过 `Request-Update` 查询上游最新版本，发现新版本时自动执行 `gh workflow run make.yml` 触发对应的构建任务
+- 可手动触发，支持 `DatabaseOnly` 参数仅更新版本数据而不触发构建
+
+#### 版本清理（cleanup.yml）
+
+- **定时触发**：每周日北京时间 **09:10**（UTC 01:10）
+- **保留策略**：每个系统版本保留最新的 **3** 个版本目录 + `latest_*.json` 中引用的版本，其余自动删除
+- 可手动触发，支持自定义保留数量（`keep_count`）和试运行模式（`dry_run`，仅预览不删除）
+
+```shell
+# 手动触发清理（试运行，看看哪些会被删）
+gh workflow run cleanup.yml -f dry_run=true
+
+# 手动触发清理（实际删除，保留最新 3 个）
+gh workflow run cleanup.yml
+
+# 自定义保留数量
+gh workflow run cleanup.yml -f keep_count=2
+```
+
+#### 全自动链路
+
+```
+check.yml（定时检测）
+  └─ 发现新版本 → gh workflow run make.yml（自动构建）
+                      └─ 构建完成 → rclone 上传到 OneDrive
+
+cleanup.yml（定时清理）
+  └─ 扫描云端目录 → 保留最新 3 个 + JSON 引用版本 → 删除旧版本
+```
+
+### 手动构建
+
 Github Cli 一键执行所有构建：
 
 ```shell
