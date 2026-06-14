@@ -1,6 +1,9 @@
 name: Cleanup Old Versions
 run-name: Cleanup ${{ inputs.dry_run == true && '(Dry Run) ' || '' }}Keep ${{ inputs.keep_count }} versions
 on:
+  schedule:
+    # 每周日北京时间 09:10 (UTC 01:10)
+    - cron: "10 1 * * 0"
   workflow_dispatch:
     inputs:
       keep_count:
