@@ -1,0 +1,219 @@
+name: Cleanup Old Versions
+run-name: Cleanup ${{ inputs.dry_run == true && '(Dry Run) ' || '' }}Keep ${{ inputs.keep_count }} versions
+on:
+  workflow_dispatch:
+    inputs:
+      keep_count:
+        description: "每个版本保留的最新数量"
+        required: false
+        default: 3
+        type: number
+      dry_run:
+        description: "试运行（仅列出待删除目录，不实际删除）"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  cleanup:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Get rclone Config
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ github.repository_owner }}/rclone-action
+          token: ${{ secrets.RCLONE_TOKEN }}
+          path: bin
+
+      - name: Setup rclone
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not (Test-Path -Path ".\bin\rclone.conf")) {
+            throw "未找到 rclone 配置文件"
+          }
+          if (-not (Test-Path -Path ".\bin\rclone.exe")) {
+            Write-Host "未找到 rclone，正在下载..."
+            Invoke-WebRequest -Uri 'https://downloads.rclone.org/rclone-current-windows-amd64.zip' -OutFile '.\temp\rclone.zip'
+            Expand-Archive -Path '.\temp\rclone.zip' -DestinationPath '.\temp\' -Force
+            Copy-Item -Path '.\temp\rclone-*-windows-amd64\rclone.exe' -Destination '.\bin\rclone.exe'
+          }
+          Write-Host "正在验证 rclone 配置..."
+          & .\bin\rclone.exe --config .\bin\rclone.conf lsd "${{ vars.RCLONE_PATH }}"
+          if ($LASTEXITCODE -ne 0) {
+            throw "rclone lsd 失败，请检查 RCLONE_PATH 和 rclone.conf"
+          }
+          Write-Host "rclone 配置验证通过！" -ForegroundColor Green
+
+      - name: Cleanup old versions
+        shell: pwsh
+        env:
+          RCLONE_PATH: ${{ vars.RCLONE_PATH }}
+          KEEP_COUNT: ${{ inputs.keep_count }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $rclone = ".\bin\rclone.exe"
+          $rcloneArgs = @("--config", ".\bin\rclone.conf")
+          $keepCount = [int]$env:KEEP_COUNT
+          $dryRun = $env:DRY_RUN -eq "true"
+          $basePath = $env:RCLONE_PATH
+
+          if ($dryRun) {
+            Write-Host "===== 试运行模式：不会实际删除任何文件 =====" -ForegroundColor Yellow
+          }
+
+          function Invoke-Rclone {
+            param([string[]]$Args2)
+            $output = & $rclone $rcloneArgs $Args2 2>&1
+            return $output
+          }
+
+          # 遍历 os_ver 目录（如 10, 11）
+          $osVers = Invoke-Rclone @("lsf", $basePath) | Where-Object { $_ -match '^\d+/?$' } | ForEach-Object { $_.TrimEnd('/') }
+          if (-not $osVers) {
+            Write-Host "未找到任何 os_ver 目录" -ForegroundColor Yellow
+            return
+          }
+
+          $totalDeleted = 0
+          $totalSkipped = 0
+          $totalFreed = 0
+
+          foreach ($osVer in $osVers) {
+            Write-Host "`n========================================" -ForegroundColor Cyan
+            Write-Host "扫描 os_ver: $osVer" -ForegroundColor Cyan
+            Write-Host "========================================" -ForegroundColor Cyan
+
+            # 遍历 os_release 目录（如 24H2, 23H2, LTSC2024）
+            $releases = Invoke-Rclone @("lsf", "$basePath/$osVer") | Where-Object { $_ -match '^[^/]+/?$' } | ForEach-Object { $_.TrimEnd('/') }
+            if (-not $releases) { continue }
+
+            foreach ($release in $releases) {
+              Write-Host "`n--- $osVer / $release ---" -ForegroundColor Green
+
+              $releasePath = "$basePath/$osVer/$release"
+
+              # 列出该 release 下的所有子目录（版本目录）
+              $allDirs = Invoke-Rclone @("lsf", "--dirs-only", $releasePath) |
+                Where-Object { $_ -match '^[\d.]+/?$' } |
+                ForEach-Object { $_.TrimEnd('/') }
+
+              if (-not $allDirs -or $allDirs.Count -eq 0) {
+                Write-Host "  无版本目录，跳过" -ForegroundColor Gray
+                continue
+              }
+
+              # 收集 JSON 引用的版本（latest_*.json 中的 os_version）
+              $referencedVersions = @()
+              $jsonFiles = Invoke-Rclone @("lsf", "--files-only", $releasePath) |
+                Where-Object { $_ -match '^latest_.*\.json$' }
+
+              foreach ($jsonFile in $jsonFiles) {
+                Write-Host "  解析引用: $jsonFile" -ForegroundColor Gray
+                $tmpFile = ".\temp\$jsonFile"
+                New-Item -Path ".\temp" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
+                & $rclone $rcloneArgs copyto "$releasePath/$jsonFile" $tmpFile 2>$null
+                if (Test-Path $tmpFile) {
+                  try {
+                    $jsonContent = Get-Content $tmpFile | ConvertFrom-Json
+                    if ($jsonContent.os_version) {
+                      $referencedVersions += $jsonContent.os_version
+                      Write-Host "    -> 引用版本: $($jsonContent.os_version)" -ForegroundColor Gray
+                    }
+                  } catch {
+                    Write-Warning "    解析 $jsonFile 失败: $_"
+                  }
+                  Remove-Item $tmpFile -Force -ErrorAction SilentlyContinue
+                }
+              }
+
+              # 按版本号降序排序（版本号格式如 26100.1742）
+              $sortedDirs = $allDirs | Sort-Object {
+                $parts = $_.Split('.')
+                [long]$parts[0] * 1000000 + [long]$parts[1]
+              } -Descending
+
+              # 构建保留名单：最新 N 个 + JSON 引用的版本
+              $keepSet = [System.Collections.Generic.HashSet[string]]::new(
+                [System.StringComparer]::OrdinalIgnoreCase
+              )
+
+              # 保留最新的 N 个
+              $latestN = $sortedDirs | Select-Object -First $keepCount
+              foreach ($d in $latestN) { [void]$keepSet.Add($d) }
+
+              # 保留 JSON 引用的版本
+              foreach ($ref in $referencedVersions) {
+                [void]$keepSet.Add($ref)
+              }
+
+              Write-Host "  版本目录总数: $($sortedDirs.Count)" -ForegroundColor White
+              Write-Host "  保留数量: $($keepSet.Count) (最新 $keepCount + 引用 $($referencedVersions.Count))" -ForegroundColor White
+
+              # 计算待删除列表
+              $toDelete = $sortedDirs | Where-Object { -not $keepSet.Contains($_) }
+
+              if (-not $toDelete -or @($toDelete).Count -eq 0) {
+                Write-Host "  无需清理" -ForegroundColor Green
+                $totalSkipped += $sortedDirs.Count
+                continue
+              }
+
+              Write-Host "  待删除: $(@($toDelete).Count) 个版本" -ForegroundColor Yellow
+
+              # 列出保留的
+              foreach ($d in $sortedDirs) {
+                if ($keepSet.Contains($d)) {
+                  Write-Host "    [保留] $d" -ForegroundColor Green
+                }
+              }
+
+              # 删除旧版本
+              foreach ($oldDir in $toDelete) {
+                $oldPath = "$releasePath/$oldDir"
+                Write-Host "    [删除] $oldDir" -ForegroundColor Red
+
+                if ($dryRun) {
+                  # 试运行：仅统计大小
+                  $totalDeleted++
+                  $sizeOutput = Invoke-Rclone @("size", "--json", $oldPath)
+                  try {
+                    $sizeInfo = $sizeOutput | ConvertFrom-Json
+                    $totalFreed += $sizeInfo.bytes
+                  } catch { }
+                  continue
+                }
+
+                # 实际删除
+                & $rclone $rcloneArgs purge $oldPath --progress
+                if ($LASTEXITCODE -eq 0) {
+                  $totalDeleted++
+                  Write-Host "           已删除" -ForegroundColor DarkGray
+                } else {
+                  Write-Warning "           删除失败 (exit code: $LASTEXITCODE)"
+                }
+              }
+
+              $totalSkipped += $keepSet.Count
+            }
+          }
+
+          # 汇总报告
+          Write-Host "`n========================================" -ForegroundColor Cyan
+          Write-Host "清理完成！" -ForegroundColor Cyan
+          Write-Host "========================================" -ForegroundColor Cyan
+          Write-Host "  保留版本数: $totalSkipped" -ForegroundColor Green
+          if ($dryRun) {
+            Write-Host "  待删除版本数: $totalDeleted (试运行，未实际删除)" -ForegroundColor Yellow
+            if ($totalFreed -gt 0) {
+              $freedGB = [math]::Round($totalFreed / 1GB, 2)
+              Write-Host "  预计释放空间: ${freedGB} GB" -ForegroundColor Yellow
+            }
+          } else {
+            Write-Host "  已删除版本数: $totalDeleted" -ForegroundColor Red
+          }
+
