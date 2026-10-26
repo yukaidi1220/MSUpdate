@@ -20,7 +20,8 @@ permissions:
 
 jobs:
   check:
-    runs-on: windows-latest
+    # 纯 PowerShell 网络检查 + gh 触发，跑 ubuntu-slim（pwsh/gh/jq 预装）
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -72,7 +73,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          .\.github\workflows\check.ps1 ${{ inputs.DatabaseOnly == true && '-DatabaseOnly' || '' }}
+          ./.github/workflows/check.ps1 ${{ inputs.DatabaseOnly == true && '-DatabaseOnly' || '' }}
 
       # - name: Disconnect Cloudflare WRAP
       #   shell: pwsh

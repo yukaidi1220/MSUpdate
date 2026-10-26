@@ -4,8 +4,8 @@ param (
 )
 $ErrorActionPreference = 'Stop'
 
-Import-Module "$PSScriptRoot\..\..\Modules\compare.psm1"
-Import-Module "$PSScriptRoot\..\..\Modules\request.psm1"
+Import-Module "$PSScriptRoot/../../Modules/compare.psm1"
+Import-Module "$PSScriptRoot/../../Modules/request.psm1"
 
 if (-not (Get-Module -ListAvailable -Name powershell-yaml)) {
     Write-Host "正在安装 PowerShell 模块 powershell-yaml..."
