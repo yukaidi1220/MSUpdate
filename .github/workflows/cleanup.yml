@@ -39,11 +39,8 @@ jobs:
             throw "未找到 rclone 配置文件"
           }
           if (-not (Test-Path -Path ".\bin\rclone.exe")) {
-            Write-Host "未找到 rclone，正在下载..."
-            New-Item -Path '.\temp' -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
-            Invoke-WebRequest -Uri 'https://downloads.rclone.org/rclone-current-windows-amd64.zip' -OutFile '.\temp\rclone.zip'
-            Expand-Archive -Path '.\temp\rclone.zip' -DestinationPath '.\temp\' -Force
-            Copy-Item -Path '.\temp\rclone-*-windows-amd64\rclone.exe' -Destination '.\bin\rclone.exe'
+            Write-Host "未找到 rclone，正在下载（fork 版，cloudreve 后端需要）..."
+            Invoke-WebRequest -Uri 'https://github.com/yukaidi1220/rclone/releases/latest/download/rclone-cdn-windows-amd64.exe' -OutFile '.inclone.exe'
           }
           Write-Host "正在验证 rclone 配置..."
           & .\bin\rclone.exe --config .\bin\rclone.conf lsd "${{ vars.RCLONE_PATH }}"
