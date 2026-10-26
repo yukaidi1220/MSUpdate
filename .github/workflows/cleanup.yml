@@ -41,7 +41,6 @@ jobs:
           if (-not (Test-Path -Path ".\bin\rclone.exe")) {
             Write-Host "未找到 rclone，正在下载（fork 版，cloudreve 后端需要）..."
             Invoke-WebRequest -Uri 'https://github.com/yukaidi1220/rclone/releases/latest/download/rclone-cdn-windows-amd64.exe' -OutFile '.\bin\rclone.exe'
-clone.exe'
           }
           Write-Host "正在验证 rclone 配置..."
           & .\bin\rclone.exe --config .\bin\rclone.conf lsd "${{ vars.RCLONE_PATH }}"
