@@ -206,7 +206,7 @@ jobs:
             # 上传 iso
             
             Write-Host "正在上传 $(Resolve-Path $json.name) 到 ${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\$($json.os_version)..."
-            .\bin\rclone.exe copy "$(Resolve-Path $json.name)" "${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\$($json.os_version)" --progress --onedrive-chunk-size 250M
+            .\bin\rclone.exe copy "$(Resolve-Path $json.name)" "${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\$($json.os_version)" --progress
 
             # 上传 json
             Write-Host "正在上传 $(Resolve-Path $_.FullName) 到 ${{ vars.RCLONE_PATH }}\$($json.os_ver)\$($json.os_release)\$($json.os_version)..."
