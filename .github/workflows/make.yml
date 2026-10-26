@@ -180,7 +180,7 @@ jobs:
           token: ${{ secrets.RCLONE_TOKEN }}
           path: bin
 
-      - name: Upload ISO to OneDrive
+      - name: Upload ISO to cloudreve
         shell: pwsh
         run: |
           # 安装依赖
@@ -189,10 +189,9 @@ jobs:
               throw "未找到 rclone 配置文件"
           }
           if (-not (Test-Path -Path ".\bin\rclone.exe")) {
-            Write-Host "未找到 rclone，正在下载..."
-            Invoke-WebRequest -Uri 'https://downloads.rclone.org/rclone-current-windows-amd64.zip' -outfile .\temp\rclone.zip
-            Expand-Archive -Path .\temp\rclone.zip -DestinationPath .\temp\ -Force
-            Copy-Item -Path .\temp\rclone-*-windows-amd64\rclone.exe -Destination .\bin\rclone.exe
+            Write-Host "未找到 rclone，正在下载（fork 版，RCLONE_PATH 的 cloudreve 后端需要）..."
+            # 官方 rclone 没有 cloudreve 后端；release/latest 由 fork 的 tag 流维护
+            Invoke-WebRequest -Uri 'https://github.com/yukaidi1220/rclone/releases/latest/download/rclone-cdn-windows-amd64.exe' -outfile .\bin\rclone.exe
           }
           # 上传到云端
           Get-ChildItem -Path ".\*.json" -File | ForEach-Object {
