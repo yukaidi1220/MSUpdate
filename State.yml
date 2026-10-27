@@ -1,6 +1,6 @@
 w11-26h1:
   Version: "28000.3351"
-  RebuiltFor: ""
+  RebuiltFor: "28000.3351"
   Pointers:
   - https://res.yukaidi.top/d/gslb/mupan/System_MSUpdate/11/26H1/latest_x64.json
   Commands:
@@ -17,7 +17,7 @@ w11-25h2:
   - gh workflow run make.yml -f makeversion=w1125h264 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=false
   - gh workflow run make.yml -f makeversion=w1125h264 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=true
 w11-26h2:
-  Version: "26200.9539"
+  Version: "26300.9807"
   RebuiltFor: ""
   Commands:
   # - gh workflow run make.yml -f makeversion=w1126h2a64 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=false
@@ -77,6 +77,7 @@ w10-1809:
   Commands:
   - gh workflow run make.yml -f makeversion=w10lt1964 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=false
   # - gh workflow run make.yml -f makeversion=w10lt1932 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=false
+
 
 
 
