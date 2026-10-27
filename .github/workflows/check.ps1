@@ -55,10 +55,10 @@ foreach ($Category in $CurrentState.Keys) {
             # latest 指针里的 os_version 是"线上到底是谁"的唯一可信来源。不一致就按
             # 正常更新的方式再触发一次构建；同一版本只重试一次（RebuiltFor），防止
             # 两个源永久分歧时每轮都白打一次构建。
-            # 尚未配置 Pointers 的通道（如刚加入、还没首建的 26H2）不参与核查。
-            # 注意 @($null).Count 是 1：没有 Pointers 键的通道会得到一个 $null 元素，
-            # 不过滤的话空串会传进 Get-PointerState，在 Stop 语义下炸掉整个检查。
-            $pointerUrls = @($CurrentState.$Category.Pointers | Where-Object { -not [string]::IsNullOrEmpty($_) })
+            # 尚未配置 Pointers 的通道（如刚加入、还没首建的 26H2）不参与核查：
+            # 归一化在 Get-ChannelPointers 里（@($null).Count 是 1 的坑、标量写法、
+            # 空项过滤都在那一处挡住并有测试覆盖）
+            $pointerUrls = @(Get-ChannelPointers -Pointers $CurrentState.$Category.Pointers)
             if (-not $DatabaseOnly -and $pointerUrls.Count -gt 0) {
                 $pointerStates = @(foreach ($u in $pointerUrls) { Get-PointerState -Url $u })
                 foreach ($p in $pointerStates) {
@@ -85,6 +85,10 @@ foreach ($Category in $CurrentState.Keys) {
                         $CurrentState.$Category.RebuiltFor = $CurrentVersion
                     }
                     "AlreadyRetried" {
+                        # 已知取舍（审查确认）：一个版本只有一次自动重试机会，与不一致
+                        # 的原因无关。若重试那局构建又失败（比如 2026-10-17 那种基础设施
+                        # 故障），本通道该版本不会再自动重试，只能靠这条红告警把人引来。
+                        # 这好过修指针核查前的"永远静默卡死"，但不是全自动自愈。
                         Write-Host -ForegroundColor Red "$Category 指针与 state 仍不一致，但本版本已重试过一次，跳过——多为检查源与构建源的镜像差异，需人工核对"
                     }
                     default {
@@ -106,7 +110,10 @@ foreach ($Category in $CurrentState.Keys) {
     $StateContent = [regex]::Replace($StateContent, $pattern, $replacement)
 
     # RebuiltFor 紧跟 Version 行（State.yml 里的固定布局），同样按通道定位替换；
-    # 没有该行的通道（旧布局）替换不到，等于保持原样
+    # 没有该行的通道（旧布局）替换不到，等于保持原样。
+    # ⚠️ 布局约定：若以后调整 State.yml 里键的顺序（比如把 Pointers 挪到
+    # RebuiltFor 前面），这里的锚点会静默失配——RebuiltFor 从此不再写回，
+    # 每个版本会退回"每轮都重试"。改布局必须同步改这条正则（审查 2026-10-28 提出）。
     $NewRebuiltFor = [string]$CurrentState.$Category.RebuiltFor
     $patternRebuilt = "(?m)(^$([regex]::Escape($Category)):\s*\r?\n\s*Version:\s*""[^""\r\n]*""\s*\r?\n\s*RebuiltFor:\s*"")[^""\r\n]*("")"
     $replacementRebuilt = "`${1}${NewRebuiltFor}`${2}"

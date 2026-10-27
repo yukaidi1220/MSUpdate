@@ -27,6 +27,9 @@ function Get-PointerState {
         Error   = ""
     }
     try {
+        # OpenList 对指针会 302 到带签名的对象存储直链，Invoke-WebRequest 默认跟随，
+        # 正常落地是 200 + JSON。若签名直链本身 404/403，会被归为 Error（而非
+        # Missing）——判定结果同样是 NeedsRebuild，只是日志措辞不如 404 精确。
         $res = Invoke-WebRequest -Uri $Url -SkipHttpErrorCheck -TimeoutSec 30
         if ($res.StatusCode -eq 404) {
             $result.Missing = $true
@@ -77,4 +80,28 @@ function Get-RebuildDecision {
     return "NeedsRebuild"
 }
 
-Export-ModuleMember -Function Get-PointerState, Get-RebuildDecision
+function Get-ChannelPointers {
+    <#
+    .SYNOPSIS
+    把 State.yml 里某通道的 Pointers 值归一化成干净的 URL 字符串数组。
+    .NOTES
+    两个坑都在这里挡住：
+      1) 没配 Pointers 的通道（如刚加入还没首建的 w11-26h2）经 ConvertFrom-Yaml
+         得到 $null，而 @($null).Count 是 1——不过滤的话空串会传进
+         Get-PointerState，在 $ErrorActionPreference='Stop' 下炸掉整个检查；
+      2) 有人在 State.yml 里写成标量（Pointers: <url> 而不是列表）时，
+         PowerShell 管道会把字符串按字符逐个吐出来，必须先包成单元素数组。
+    #>
+    [OutputType([string[]])]
+    param (
+        [AllowNull()]$Pointers
+    )
+    if ($null -eq $Pointers) { return @() }
+    if ($Pointers -is [string]) { $Pointers = @($Pointers) }
+    $clean = @($Pointers | Where-Object { -not [string]::IsNullOrEmpty($_) })
+    # PowerShell 函数返回会展开数组：不加 -NoEnumerate，标量输入时调用方拿到的是
+    # 字符串本身，$r[0] 取到第一个字符而不是第一个 URL（审查后补的测试抓到过）
+    Write-Output -NoEnumerate $clean
+}
+
+Export-ModuleMember -Function Get-PointerState, Get-RebuildDecision, Get-ChannelPointers
