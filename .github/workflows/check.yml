@@ -3,9 +3,9 @@ run-name: Check UUPDUMP ${{ inputs.DatabaseOnly == true && '(DatabaseOnly)' || '
 
 on:
   schedule:
-    # 北京时间每天下午2点 (06:00 UTC) 和早上7点半 (23:30 UTC 前一天)
-    - cron: "0 6 * * *"
-    - cron: "30 23 * * *"
+    # 北京时间每天上午8点 (00:00 UTC) 和下午6点 (10:00 UTC)
+    - cron: "0 0 * * *"
+    - cron: "0 10 * * *"
   workflow_dispatch:
     inputs:
       DatabaseOnly:
