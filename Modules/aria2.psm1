@@ -105,15 +105,30 @@ function Invoke-Aria2Download {
     # 构建 aria2 命令
     $aria2 = "& .\bin\aria2c.exe $($Options -join ' ')"
 
-    # 处理 aria2 控制台输出
-    Write-Host '正在使用 aria2 开始下载...' -ForegroundColor Green
-    Write-Host "  命令: $aria2" -ForegroundColor Cyan
-    Invoke-Command ([scriptblock]::Create($aria2))
+    # 处理 aria2 控制台输出（带重试：初跑 + 最多 2 次重试，间隔 10s，来自上游 993efa1）
+    $maxRetries = 2
+    $retryCount = 0
+    $success = $false
+    while (-not $success -and $retryCount -le $maxRetries) {
+        Write-Host '正在使用 aria2 开始下载...' -ForegroundColor Green
+        Write-Host "  命令: $aria2" -ForegroundColor Cyan
+        Invoke-Command ([scriptblock]::Create($aria2))
 
-    # 处理 aria2 错误
-    Write-Host ''
-    if ($LASTEXITCODE -gt 0) {
-        Write-Error "下载失败！(错误 $LASTEXITCODE) $(Get-Aria2Error $lastexitcode)"
+        Write-Host ''
+        if ($LASTEXITCODE -eq 0) {
+            $success = $true
+        } else {
+            $retryCount++
+            if ($retryCount -le $maxRetries) {
+                Write-Host -ForegroundColor Yellow "下载失败（错误 ${LASTEXITCODE}: $(Get-Aria2Error $LASTEXITCODE)），10 秒后重试...（第 $retryCount/$maxRetries 次）"
+                Start-Sleep -Seconds 10
+            }
+        }
+    }
+
+    # 重试耗尽仍失败才报错
+    if (-not $success) {
+        Write-Error "下载失败！(错误 $LASTEXITCODE) $(Get-Aria2Error $LASTEXITCODE)"
     }
 }
 
