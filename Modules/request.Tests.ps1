@@ -1,69 +1,74 @@
 # Requires -Modules Pester
 Import-Module Pester
 
-# 导入待测试的模块
-Import-Module "$PSScriptRoot/request.psm1" -Force
+# Pester 5 的发现/运行两阶段在不同会话状态里：顶层定义的函数在运行期不可见
+# （2026-10 runner 镜像带的新版 Pester 上首次暴露，之前一直能跑）。按官方规范
+# 把模块导入与断言 helper 全部收进 BeforeAll。
+BeforeAll {
+    # 导入待测试的模块
+    Import-Module "$PSScriptRoot/request.psm1" -Force
 
-function Assert-Matches {
-    param (
-        [AllowNull()]$Actual,
-        [string]$Pattern
-    )
-    if ($Actual -notmatch $Pattern) {
-        throw "断言失败: [$Actual] 不匹配正则 [$Pattern]"
+    function Assert-Matches {
+        param (
+            [AllowNull()]$Actual,
+            [string]$Pattern
+        )
+        if ($Actual -notmatch $Pattern) {
+            throw "断言失败: [$Actual] 不匹配正则 [$Pattern]"
+        }
     }
-}
 
-function Assert-ContainsItem {
-    param (
-        $Collection,
-        [string]$Expected
-    )
-    if (-not ($Collection -contains $Expected)) {
-        throw "断言失败: 集合不包含 [$Expected]"
+    function Assert-ContainsItem {
+        param (
+            $Collection,
+            [string]$Expected
+        )
+        if (-not ($Collection -contains $Expected)) {
+            throw "断言失败: 集合不包含 [$Expected]"
+        }
     }
-}
 
-function Assert-NotNull {
-    param (
-        [AllowNull()]$Actual
-    )
-    if ($null -eq $Actual) {
-        throw "断言失败: 值不应为 null"
+    function Assert-NotNull {
+        param (
+            [AllowNull()]$Actual
+        )
+        if ($null -eq $Actual) {
+            throw "断言失败: 值不应为 null"
+        }
     }
-}
 
-function Assert-Type {
-    param (
-        [AllowNull()]$Actual,
-        [type]$ExpectedType
-    )
-    Assert-NotNull $Actual
-    if (-not ($Actual -is $ExpectedType)) {
-        throw "断言失败: 实际类型 [$($Actual.GetType().FullName)] 不是 [$($ExpectedType.FullName)]"
+    function Assert-Type {
+        param (
+            [AllowNull()]$Actual,
+            [type]$ExpectedType
+        )
+        Assert-NotNull $Actual
+        if (-not ($Actual -is $ExpectedType)) {
+            throw "断言失败: 实际类型 [$($Actual.GetType().FullName)] 不是 [$($ExpectedType.FullName)]"
+        }
     }
-}
 
-function Assert-GreaterThan {
-    param (
-        [long]$Actual,
-        [long]$Expected
-    )
-    if ($Actual -le $Expected) {
-        throw "断言失败: [$Actual] 不大于 [$Expected]"
+    function Assert-GreaterThan {
+        param (
+            [long]$Actual,
+            [long]$Expected
+        )
+        if ($Actual -le $Expected) {
+            throw "断言失败: [$Actual] 不大于 [$Expected]"
+        }
     }
-}
 
-function Assert-Throws {
-    param (
-        [scriptblock]$ScriptBlock
-    )
-    try {
-        & $ScriptBlock
-    } catch {
-        return
+    function Assert-Throws {
+        param (
+            [scriptblock]$ScriptBlock
+        )
+        try {
+            & $ScriptBlock
+        } catch {
+            return
+        }
+        throw "断言失败: 脚本块没有抛出错误"
     }
-    throw "断言失败: 脚本块没有抛出错误"
 }
 
 Describe "Request-Update" {
