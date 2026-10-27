@@ -81,6 +81,13 @@ Describe "Request-Update" {
         }
     }
 
+    Context "当 Category 为 w11-26h2 时" {
+        It "应返回 number.number 格式的版本号" {
+            $result = Request-Update -Category "w11-26h2"
+            Assert-Matches $result '^26300\.\d+$'
+        }
+    }
+
     Context "当 Category 为 w11-21h2 时" {
         It "应返回 number.number 格式的版本号" {
             $result = Request-Update -Category "w11-21h2"

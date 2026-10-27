@@ -146,6 +146,62 @@ switch ($MakeVersion) {
         $msstore = $true
         $Cleanup = $false
     }
+    "w1126h2a64" {
+        # 制作 Win11 26H2 ARM64（合上游 0452731；26H2 与 25H2 共用同一基盘 ISO，仅 uupdump 类别不同）
+        $os_ver = "11"
+        $os_rsversion = "26H2"
+        $os_build = "26200"
+        $os_edition = "CoreCountrySpecific"
+        $os_display = "Windows $os_ver $os_rsversion"
+        $os_arch = "arm64"
+        $os_lang = "zh-cn"
+        $os_path = "/gslb/mupan/Origin_System/X23-81947_26100.1742.240906-0331.ge_release_svc_refresh_CLIENTCHINA_OEM_A64FRE_zh-cn.iso"
+        # $os_path = "/系统/MSDN/NT10.0_Win11/26100_24H2/1742_RTM/Win11_24H2_China_GGK_Chinese_Simplified_Arm64.iso"
+        $os_md5 = "8cc8080e1c4b08ccd0ad4435ac0f2e5c"
+        $UpdateFromUUP = $true
+        $uupid = (Invoke-UUPWebRequestLink `
+                -Url "known.php?q=category:w11-26h2" `
+                -LinkFilter @("*selectlang.php?id=*") `
+                -ContentFilter @("*Windows 11,*arm64*") `
+                -FirstLink
+        ).Replace("selectlang.php?id=", "")
+        $Miracast = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-WirelessDisplay-FOD-Package-arm64.cab"
+        $MiracastLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-WirelessDisplay-FOD-Package-arm64-zh-CN.cab"
+        $iexplorer = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-InternetExplorer-Optional-Package-arm64.cab"
+        $iexplorerLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-InternetExplorer-Optional-Package-arm64-zh-CN.cab"
+        $entgpack = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-EditionSpecific-EnterpriseG-Package.ESD"
+        $entgLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-Client-LanguagePack-Package-arm64-zh-CN.esd"
+        $msstore = $true
+        $Cleanup = $false
+    }
+    "w1126h264" {
+        # 制作 Win11 26H2 X64（合上游 0452731；26H2 与 25H2 共用同一基盘 ISO，仅 uupdump 类别不同）
+        $os_ver = "11"
+        $os_rsversion = "26H2"
+        $os_build = "26200"
+        $os_edition = "CoreCountrySpecific"
+        $os_display = "Windows $os_ver $os_rsversion"
+        $os_arch = "x64"
+        $os_lang = "zh-cn"
+        $os_path = "/gslb/mupan/Origin_System/X23-81948_26100.1742.240906-0331.ge_release_svc_refresh_CLIENTCHINA_OEM_x64FRE_zh-cn.iso"
+        # $os_path = "/系统/MSDN/NT10.0_Win11/26100_24H2/1742_RTM/Win11_24H2_China_GGK_Chinese_Simplified_x64.iso"
+        $os_md5 = "e5c05b0215d3e4af2f2fd4ea16252f91"
+        $UpdateFromUUP = $true
+        $uupid = (Invoke-UUPWebRequestLink `
+                -Url "known.php?q=category:w11-26h2" `
+                -LinkFilter @("*selectlang.php?id=*") `
+                -ContentFilter @("*Windows 11,*amd64*") `
+                -FirstLink
+        ).Replace("selectlang.php?id=", "")
+        $Miracast = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-WirelessDisplay-FOD-Package-amd64.cab"
+        $MiracastLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-WirelessDisplay-FOD-Package-amd64-zh-CN.cab"
+        $iexplorer = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-InternetExplorer-Optional-Package-amd64.cab"
+        $iexplorerLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-InternetExplorer-Optional-Package-amd64-zh-CN.cab"
+        $entgpack = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-EditionSpecific-EnterpriseG-Package.ESD"
+        $entgLP = Get-UUPFileLink -Id $uupid -FileName "Microsoft-Windows-Client-LanguagePack-Package-amd64-zh-CN.esd"
+        $msstore = $true
+        $Cleanup = $false
+    }
     "w11lt24a64" {
         # 制作 Win11 LTSC2024 ARM64
         $os_ver = "11"

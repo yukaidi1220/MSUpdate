@@ -168,6 +168,11 @@ gh workflow run make.yml -f makeversion=w1125h2a64 -f UpdateFromUUP=true -f Mult
 gh workflow run make.yml -f makeversion=w1125h264 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=false
 gh workflow run make.yml -f makeversion=w1125h264 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=true
 
+gh workflow run make.yml -f makeversion=w1126h2a64 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=false
+# gh workflow run make.yml -f makeversion=w1126h2a64 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=true
+gh workflow run make.yml -f makeversion=w1126h264 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=false
+gh workflow run make.yml -f makeversion=w1126h264 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=true
+
 gh workflow run make.yml -f makeversion=w1124h264 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=false
 gh workflow run make.yml -f makeversion=w1124h264 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=true
 
@@ -222,6 +227,7 @@ $SkipCheck     = [bool]   $True
 
 - MakeVersion：选择制作的系统版本
   - w1125h264
+  - w1126h264
   - w1124h264
   - w1123h264
   - w1121h264
