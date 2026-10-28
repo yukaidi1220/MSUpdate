@@ -130,25 +130,30 @@ Describe "Get-PointerState" {
 }
 
 Describe "Get-ChannelPointers" {
-    It "没配 Pointers 的通道（$null）返回空数组——这是 @(`$null).Count 等于 1 的坑的防线" {
-        (Get-ChannelPointers -Pointers $null) | Should -Be @()
-        (Get-ChannelPointers -Pointers $null).Count | Should -Be 0
+    # 调用约定：函数正常展开输出，调用方用 @() 收集（check.ps1 就是这么用的）。
+    # -NoEnumerate 方案实测有坑：列表输入时整个数组作为单元素穿过 @()，
+    # 元素变成数组而不是 URL 字符串（run 40610003943 的线上事故）。
+
+    It "没配 Pointers 的通道（`$null）经 @() 收集后为空数组——@(`$null).Count 等于 1 的坑的防线" {
+        $r = @(Get-ChannelPointers -Pointers $null)
+        $r.Count | Should -Be 0
     }
 
-    It "正常列表原样通过，空项被滤掉" {
-        $r = Get-ChannelPointers -Pointers @("https://a/latest_x64.json", "", "https://b/latest_x64.json")
+    It "正常列表经 @() 收集后元素是字符串数组，空项被滤掉" {
+        $r = @(Get-ChannelPointers -Pointers @("https://a/latest_x64.json", "", "https://b/latest_x64.json"))
         $r.Count | Should -Be 2
         $r[0] | Should -Be "https://a/latest_x64.json"
         $r[1] | Should -Be "https://b/latest_x64.json"
     }
 
-    It "标量写法（Pointers: <url>）不会按字符逐个拆开" {
-        $r = Get-ChannelPointers -Pointers "https://a/latest_x64.json"
+    It "标量写法（Pointers: <url>）经 @() 收集后是单元素字符串，不会被按字符拆开" {
+        $r = @(Get-ChannelPointers -Pointers "https://a/latest_x64.json")
         $r.Count | Should -Be 1
         $r[0] | Should -Be "https://a/latest_x64.json"
     }
 
     It "全空列表返回空数组" {
-        (Get-ChannelPointers -Pointers @("", "")) | Should -Be @()
+        $r = @(Get-ChannelPointers -Pointers @("", ""))
+        $r.Count | Should -Be 0
     }
 }

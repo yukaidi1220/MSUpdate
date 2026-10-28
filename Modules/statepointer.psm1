@@ -98,10 +98,12 @@ function Get-ChannelPointers {
     )
     if ($null -eq $Pointers) { return @() }
     if ($Pointers -is [string]) { $Pointers = @($Pointers) }
+    # 按 PowerShell 惯例正常展开输出，调用方用 @() 收集成数组。
+    # 不要用 Write-Output -NoEnumerate：实测（2026-10-28 线上）列表输入时整个数组
+    # 会作为单元素穿过，调用方 @() 再包一层，$u 变成 ["url"] 数组，
+    # Get-PointerState -Url 收到数组直接炸掉整个检查（run 40610003943）。
     $clean = @($Pointers | Where-Object { -not [string]::IsNullOrEmpty($_) })
-    # PowerShell 函数返回会展开数组：不加 -NoEnumerate，标量输入时调用方拿到的是
-    # 字符串本身，$r[0] 取到第一个字符而不是第一个 URL（审查后补的测试抓到过）
-    Write-Output -NoEnumerate $clean
+    return $clean
 }
 
 Export-ModuleMember -Function Get-PointerState, Get-RebuildDecision, Get-ChannelPointers
