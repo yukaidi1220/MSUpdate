@@ -1,6 +1,7 @@
 w11-26h1:
-  Version: "28000.3351"
-  RebuiltFor: "28000.3351"
+  Version: "28000.3231"
+  RebuiltFor: ""
+  Filter: "*Windows 11,*amd64*"
   Pointers:
   - https://res.yukaidi.top/d/gslb/mupan/System_MSUpdate/11/26H1/latest_x64.json
   Commands:
@@ -10,6 +11,7 @@ w11-26h1:
 w11-25h2:
   Version: "26200.9807"
   RebuiltFor: ""
+  Filter: "*Windows 11,*amd64*"
   Pointers:
   - https://res.yukaidi.top/d/gslb/mupan/System_MSUpdate/11/25H2/latest_x64.json
   Commands:
@@ -19,6 +21,7 @@ w11-25h2:
 w11-26h2:
   Version: "26300.9807"
   RebuiltFor: ""
+  Filter: "*Windows 11,*amd64*"
   Commands:
   # - gh workflow run make.yml -f makeversion=w1126h2a64 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=false
   - gh workflow run make.yml -f makeversion=w1126h264 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=false
@@ -26,6 +29,7 @@ w11-26h2:
 w11-24h2:
   Version: "26100.9725"
   RebuiltFor: ""
+  Filter: "*Windows 11,*amd64*"
   Pointers:
   - https://res.yukaidi.top/d/gslb/mupan/System_MSUpdate/11/24H2/latest_x64.json
   - https://res.yukaidi.top/d/gslb/mupan/System_MSUpdate/11/LTSC2024/latest_x64.json
@@ -38,6 +42,7 @@ w11-24h2:
 w11-23h2:
   Version: "22631.7654"
   RebuiltFor: ""
+  Filter: "*Windows 11*amd64*"
   Pointers:
   - https://res.yukaidi.top/d/gslb/mupan/System_MSUpdate/11/23H2/latest_x64.json
   Commands:
@@ -47,6 +52,7 @@ w11-23h2:
 w11-21h2:
   Version: "22000.3260"
   RebuiltFor: ""
+  Filter: "*Windows 11*amd64*"
   Pointers:
   - https://res.yukaidi.top/d/gslb/mupan/System_MSUpdate/11/21H2/latest_x64.json
   Commands:
@@ -55,6 +61,7 @@ w11-21h2:
 w10-22h2:
   Version: "19045.7811"
   RebuiltFor: ""
+  Filter: "*Windows 10,*amd64*"
   Pointers:
   - https://res.yukaidi.top/d/gslb/mupan/System_MSUpdate/10/22H2/latest_x64.json
   Commands:
@@ -64,6 +71,7 @@ w10-22h2:
 w10-21h2:
   Version: "19044.7811"
   RebuiltFor: ""
+  Filter: "*Windows 10,*amd64*"
   Pointers:
   - https://res.yukaidi.top/d/gslb/mupan/System_MSUpdate/10/LTSC2021/latest_x64.json
   Commands:
@@ -72,6 +80,7 @@ w10-21h2:
 w10-1809:
   Version: "17763.9378"
   RebuiltFor: ""
+  Filter: "*Windows 10*amd64*"
   Pointers:
   - https://res.yukaidi.top/d/gslb/mupan/System_MSUpdate/10/LTSC2019/latest_x64.json
   Commands:

@@ -22,7 +22,9 @@ $CurrentState = $StateContent | ConvertFrom-Yaml -Ordered
 foreach ($Category in $CurrentState.Keys) {
     $CurrentVersion = $CurrentState.$Category.Version
     Write-Host -ForegroundColor Yellow "$Category 当前版本: $CurrentVersion"
-    $LatestVersion = Request-Update -Category $Category
+    # Filter 与构建侧（msupdate.ps1 对应 makeversion 的 -ContentFilter）同源同语义，
+    # State.yml 里每通道一份；缺省回落旧宽过滤（*amd64*），但现役通道都已配置
+    $LatestVersion = Request-Update -Category $Category -ContentFilter "$($CurrentState.$Category.Filter)"
 
     if ($LatestVersion) {
         $IsNewerVersion = Compare-Version -CurrentVersion $CurrentVersion -LatestVersion $LatestVersion

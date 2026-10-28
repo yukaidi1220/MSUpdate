@@ -96,14 +96,20 @@ function Request-Update {
     [OutputType([string])]
     param (
         [string] $Category,
-        [string] $QueryString
+        [string] $QueryString,
+        # 与构建侧（msupdate.ps1 各通道的 -ContentFilter）保持同一语义：检查选中的
+        # 必须是"实际会构建的那个更新"。2026-10-28 实测教训：这里若用宽过滤
+        # （*amd64*），分类页第一条可能是 Preview Update（月度预览累积，版本号更高，
+        # 如 26H1 的 28000.3351），而构建侧只取 "Windows 11," 正式通道条目
+        # （28000.3231）——state 从此永远领先镜像，永不汇合。
+        [string] $ContentFilter = "*amd64*"
     )
     if ($Category) {
         $Name = $Category
-        $AllLinks = Invoke-UUPWebRequestLink -Url "known.php?q=category:$Category" -LinkFilter @("*selectlang.php?id=*") -ContentFilter @("*amd64*")
+        $AllLinks = Invoke-UUPWebRequestLink -Url "known.php?q=category:$Category" -LinkFilter @("*selectlang.php?id=*") -ContentFilter @($ContentFilter)
     } elseif ($QueryString) {
         $Name = $QueryString
-        $AllLinks = Invoke-UUPWebRequestLink -Url "known.php?q=$QueryString" -LinkFilter @("*selectlang.php?id=*") -ContentFilter @("*amd64*")
+        $AllLinks = Invoke-UUPWebRequestLink -Url "known.php?q=$QueryString" -LinkFilter @("*selectlang.php?id=*") -ContentFilter @($ContentFilter)
     } else {
         Write-Host -ForegroundColor Red "请指定正确的参数。"
         return $null
