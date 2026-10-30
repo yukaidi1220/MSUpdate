@@ -1,15 +1,17 @@
 name: Cleanup Old Versions
-run-name: Cleanup ${{ inputs.dry_run == true && '(Dry Run) ' || '' }}Keep ${{ inputs.keep_count }} versions
+run-name: Cleanup ${{ inputs.dry_run == true && '(Dry Run) ' || '' }}Keep ${{ inputs.keep_count || '2' }} versions
 on:
   schedule:
-    # 每周日北京时间 09:10 (UTC 01:10)
-    - cron: "10 1 * * 0"
+    # 每天北京时间 08:30（UTC 00:30），在 nightly 构建窗口之后。
+    # 2026-10-30 起改为每天：原版树已占 367GB（最多 5 个版本/release），
+    # 与修改版树合计 756GB，1TB 盘每周清一次会顶到上限。
+    - cron: "30 0 * * *"
   workflow_dispatch:
     inputs:
       keep_count:
-        description: "每个版本保留的最新数量"
+        description: "每个 release 保留的最新版本数（默认 2）"
         required: false
-        default: 3
+        default: 2
         type: number
       dry_run:
         description: "试运行（仅列出待删除目录，不实际删除）"
@@ -57,7 +59,7 @@ jobs:
           # workflow_dispatch 生效），[int]"" 等于 0，会让周日的定时清理只保留
           # 指针引用的版本（相当于 keep=1），而不是设计的 3 个。
           # maker 侧的 cleanup-builds.yml 同理用了 || 回退（2026-10-28 核对）。
-          KEEP_COUNT: ${{ inputs.keep_count || '3' }}
+          KEEP_COUNT: ${{ inputs.keep_count || '2' }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
           $ErrorActionPreference = 'Stop'
