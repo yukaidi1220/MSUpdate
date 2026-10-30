@@ -53,7 +53,11 @@ jobs:
         shell: pwsh
         env:
           RCLONE_PATH: ${{ vars.RCLONE_PATH }}
-          KEEP_COUNT: ${{ inputs.keep_count }}
+          # 必须带 || '3' 回退：schedule 触发时 inputs.* 全为空串（默认值只对
+          # workflow_dispatch 生效），[int]"" 等于 0，会让周日的定时清理只保留
+          # 指针引用的版本（相当于 keep=1），而不是设计的 3 个。
+          # maker 侧的 cleanup-builds.yml 同理用了 || 回退（2026-10-28 核对）。
+          KEEP_COUNT: ${{ inputs.keep_count || '3' }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
           $ErrorActionPreference = 'Stop'
