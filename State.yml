@@ -22,6 +22,8 @@ w11-26h2:
   Version: "26300.9818"
   RebuiltFor: ""
   Filter: "*Windows 11,*amd64*"
+  Pointers:
+  - https://res.yukaidi.top/d/gslb/mupan/System_MSUpdate/11/26H2/latest_x64.json
   Commands:
   # - gh workflow run make.yml -f makeversion=w1126h2a64 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=false
   - gh workflow run make.yml -f makeversion=w1126h264 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=false
