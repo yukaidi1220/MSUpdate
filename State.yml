@@ -62,7 +62,7 @@ w11-21h2:
   - gh workflow run make.yml -f makeversion=w1121h264 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=true
 w10-22h2:
   Version: "19045.7846"
-  RebuiltFor: ""
+  RebuiltFor: "19045.7846"
   Filter: "*Windows 10,*amd64*"
   Pointers:
   - https://res.yukaidi.top/d/gslb/mupan/System_MSUpdate/10/22H2/latest_x64.json
@@ -88,6 +88,7 @@ w10-1809:
   Commands:
   - gh workflow run make.yml -f makeversion=w10lt1964 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=false
   # - gh workflow run make.yml -f makeversion=w10lt1932 -f UpdateFromUUP=true -f MultiEdition=true -f SkipCheck=false
+
 
 
 
